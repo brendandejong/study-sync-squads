@@ -2,9 +2,8 @@
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Bot, MessageSquare, X } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { Bot, MessageSquare, X, Sparkles, Send } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import UserAvatar from '@/components/UserAvatar';
 import { currentUser } from '@/data/mockData';
 import { cn } from '@/lib/utils';
@@ -15,6 +14,7 @@ interface ChatMessage {
   content: string;
   sender: 'user' | 'assistant';
   timestamp: Date;
+  isLoading?: boolean;
 }
 
 const INITIAL_MESSAGES: ChatMessage[] = [
@@ -26,37 +26,12 @@ const INITIAL_MESSAGES: ChatMessage[] = [
   },
 ];
 
-// Sample study tips that the bot can provide
-const STUDY_TIPS = [
-  "Try the Pomodoro Technique: study for 25 minutes, then take a 5-minute break.",
-  "Create mind maps to visualize connections between concepts.",
-  "Teaching others what you've learned helps reinforce your understanding.",
-  "Review your notes within 24 hours after class to improve retention.",
-  "Use mnemonic devices to remember complex information.",
-  "Study in different locations to improve memory recall.",
-  "Start with the most difficult material when your mind is fresh.",
-  "Take regular breaks - your brain needs time to process information.",
-  "Stay hydrated and eat brain-healthy foods like nuts and berries.",
-  "Get enough sleep - memory consolidation happens during deep sleep."
-];
-
-// Sample study resources the bot can recommend
-const STUDY_RESOURCES = [
-  "Khan Academy offers free courses on various subjects.",
-  "Quizlet is great for flashcards and quick reviews.",
-  "Anki uses spaced repetition to help with memorization.",
-  "Google Scholar can help you find academic papers.",
-  "YouTube has many educational channels like Crash Course.",
-  "Notion is great for organizing your study materials.",
-  "StudyBlue lets you create and share flashcards.",
-  "Coursera offers courses from top universities."
-];
-
 const ChatAssistant = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [input, setInput] = useState('');
-  const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('studyAssistantApiKey'));
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -66,7 +41,7 @@ const ChatAssistant = () => {
   }, [messages]);
 
   // Function to add a new message from the user
-  const handleSendMessage = (e: React.FormEvent) => {
+  const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!input.trim()) return;
@@ -80,55 +55,145 @@ const ChatAssistant = () => {
     };
     
     setMessages(prev => [...prev, userMessage]);
-    setInput('');
-    setIsTyping(true);
     
-    // Simulate AI thinking and responding
-    setTimeout(() => {
-      const botResponse = generateBotResponse(input);
-      setMessages(prev => [...prev, {
-        id: (Date.now() + 1).toString(),
-        content: botResponse,
-        sender: 'assistant',
-        timestamp: new Date(),
-      }]);
-      setIsTyping(false);
-    }, 1000 + Math.random() * 1000); // Random delay between 1-2 seconds
+    // Add loading message from assistant
+    const loadingMessageId = (Date.now() + 1).toString();
+    setMessages(prev => [...prev, {
+      id: loadingMessageId,
+      content: '',
+      sender: 'assistant',
+      timestamp: new Date(),
+      isLoading: true
+    }]);
+    
+    setInput('');
+    setIsLoading(true);
+    
+    try {
+      let response: string;
+      if (apiKey) {
+        // Call the OpenAI API
+        response = await fetchAIResponse(input, apiKey);
+      } else {
+        // Fallback to local response generation
+        response = generateLocalResponse(input);
+      }
+      
+      // Update the loading message with the actual response
+      setMessages(prev => prev.map(msg => 
+        msg.id === loadingMessageId 
+          ? {
+              ...msg, 
+              content: response, 
+              isLoading: false
+            } 
+          : msg
+      ));
+    } catch (error) {
+      console.error('Error getting AI response:', error);
+      
+      // Update the loading message with an error message
+      setMessages(prev => prev.map(msg => 
+        msg.id === loadingMessageId 
+          ? {
+              ...msg, 
+              content: "I'm sorry, I had trouble connecting to my knowledge base. Please try again later.", 
+              isLoading: false
+            } 
+          : msg
+      ));
+      
+      toast({
+        title: "Connection Error",
+        description: "Failed to connect to the AI service. Using local fallback responses.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
   
-  // Generate a response based on user input
-  const generateBotResponse = (userInput: string): string => {
+  // Fetch response from OpenAI API
+  const fetchAIResponse = async (userInput: string, apiKey: string): Promise<string> => {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "You are a helpful study assistant. Provide concise, practical advice about studying, time management, coordination with study groups, and academic resources. Keep responses under 150 words and be supportive but direct."
+          },
+          {
+            role: "user",
+            content: userInput
+          }
+        ],
+        max_tokens: 150,
+        temperature: 0.7
+      })
+    });
+    
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to fetch AI response');
+    }
+    
+    const data = await response.json();
+    return data.choices[0].message.content;
+  };
+  
+  // Generate a local response based on user input (fallback)
+  const generateLocalResponse = (userInput: string): string => {
     const input = userInput.toLowerCase();
     
-    // Detect study tips request
+    // Local response logic (same as before)
     if (input.includes('study tip') || input.includes('how to study') || input.includes('study better')) {
-      const randomTip = STUDY_TIPS[Math.floor(Math.random() * STUDY_TIPS.length)];
-      return `Here's a study tip: ${randomTip}`;
+      return "Try the Pomodoro Technique: study for 25 minutes, then take a 5-minute break. This helps maintain focus and prevent burnout while studying.";
     }
     
-    // Detect resource request
     if (input.includes('resource') || input.includes('tool') || input.includes('website') || input.includes('app')) {
-      const randomResource = STUDY_RESOURCES[Math.floor(Math.random() * STUDY_RESOURCES.length)];
-      return `I recommend checking out: ${randomResource}`;
+      return "I recommend checking out Khan Academy for free courses, Anki for flashcards using spaced repetition, or Google Scholar for academic papers. These are great for supplementing your studies.";
     }
     
-    // Detect time management
     if (input.includes('time') || input.includes('schedule') || input.includes('plan')) {
-      return "For effective time management, try creating a weekly schedule that includes study blocks, breaks, and other activities. Balance is key - make sure to allocate time for relaxation too!";
+      return "For effective time management, create a weekly schedule with study blocks, breaks, and other activities. Studies show that consistent study sessions of 1-2 hours are more effective than cramming.";
     }
     
-    // Detect group study
     if (input.includes('group') || input.includes('collaborate') || input.includes('team')) {
-      return "Group studying can be very effective! When meeting with your study group, set clear goals for each session, assign roles, and make sure everyone participates. You can use the calendar feature to schedule your group sessions.";
+      return "For effective group studying, set clear goals for each session, assign roles, and make sure everyone participates. You can use the calendar feature to schedule your sessions.";
     }
     
-    // Detect exam questions
     if (input.includes('exam') || input.includes('test') || input.includes('quiz')) {
-      return "When preparing for exams, create a study plan, review your notes regularly, practice with past exams if available, and form a study group to discuss challenging concepts. Remember that teaching others is one of the best ways to learn!";
+      return "When preparing for exams, create a study plan, practice with past exams if available, and form a study group. Research shows that teaching concepts to others is one of the best ways to solidify your understanding.";
     }
     
-    // General response if nothing specific is detected
-    return "I'm here to help with your study needs! You can ask me about study techniques, time management, resources, or how to make the most of your study groups.";
+    return "I'm here to help with your study needs. You can ask me about study techniques, time management, resources, or how to make the most of your study groups.";
+  };
+  
+  const handleSaveApiKey = () => {
+    const key = prompt("Enter your OpenAI API key to enable advanced AI responses:");
+    if (key) {
+      localStorage.setItem('studyAssistantApiKey', key);
+      setApiKey(key);
+      toast({
+        title: "API Key Saved",
+        description: "Your API key has been saved. The assistant will now use AI-powered responses.",
+      });
+    }
+  };
+  
+  const handleClearApiKey = () => {
+    localStorage.removeItem('studyAssistantApiKey');
+    setApiKey(null);
+    toast({
+      title: "API Key Removed",
+      description: "Your API key has been removed. The assistant will now use local responses.",
+    });
   };
 
   return (
@@ -150,15 +215,42 @@ const ChatAssistant = () => {
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5 text-primary" />
               <h3 className="font-semibold">Study Assistant</h3>
+              {apiKey ? (
+                <div className="flex items-center text-xs text-green-600 bg-green-100 px-2 py-0.5 rounded-full">
+                  <Sparkles className="h-3 w-3 mr-1" />
+                  AI-Powered
+                </div>
+              ) : (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 text-xs ml-2"
+                  onClick={handleSaveApiKey}
+                >
+                  Connect API
+                </Button>
+              )}
             </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+            <div className="flex items-center gap-2">
+              {apiKey && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs"
+                  onClick={handleClearApiKey}
+                >
+                  Reset API
+                </Button>
+              )}
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
           
           {/* Chat messages */}
@@ -185,7 +277,15 @@ const ChatAssistant = () => {
                       : "bg-muted"
                   )}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  {message.isLoading ? (
+                    <div className="flex gap-1">
+                      <span className="animate-bounce">•</span>
+                      <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>•</span>
+                      <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>•</span>
+                    </div>
+                  ) : (
+                    <p className="text-sm">{message.content}</p>
+                  )}
                   <span className="text-xs opacity-70 mt-1 block">
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -197,21 +297,6 @@ const ChatAssistant = () => {
               </div>
             ))}
             
-            {isTyping && (
-              <div className="flex items-start gap-2">
-                <div className="flex-shrink-0 mt-1 bg-primary text-primary-foreground w-8 h-8 rounded-full flex items-center justify-center">
-                  <Bot className="h-4 w-4" />
-                </div>
-                <div className="py-2 px-3 rounded-lg bg-muted">
-                  <div className="flex gap-1">
-                    <span className="animate-bounce">•</span>
-                    <span className="animate-bounce" style={{ animationDelay: "0.2s" }}>•</span>
-                    <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>•</span>
-                  </div>
-                </div>
-              </div>
-            )}
-            
             <div ref={messagesEndRef} />
           </div>
           
@@ -222,9 +307,10 @@ const ChatAssistant = () => {
               onChange={(e) => setInput(e.target.value)}
               placeholder="Ask about study tips..."
               className="flex-1"
+              disabled={isLoading}
             />
-            <Button type="submit" disabled={!input.trim() || isTyping}>
-              <MessageSquare className="h-4 w-4" />
+            <Button type="submit" disabled={!input.trim() || isLoading}>
+              <Send className="h-4 w-4" />
             </Button>
           </form>
         </div>
