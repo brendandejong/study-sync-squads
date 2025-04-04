@@ -8,6 +8,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Account from "./pages/Account";
+import Statistics from "./pages/Statistics";
 import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "react-error-boundary";
 import { AuthProvider } from "./context/AuthContext";
@@ -50,6 +51,11 @@ const App = () => (
               <Route path="/calendar" element={
                 <ProtectedRoute>
                   <Index calendarView={true} />
+                </ProtectedRoute>
+              } />
+              <Route path="/statistics" element={
+                <ProtectedRoute>
+                  <Statistics />
                 </ProtectedRoute>
               } />
               <Route path="*" element={<NotFound />} />
