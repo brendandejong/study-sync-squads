@@ -1,6 +1,6 @@
 
 import { User } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { getInitials, getRandomColor } from '@/utils/helpers';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -30,6 +30,11 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   const { updateUserProfile } = useAuth();
   const bgColor = getRandomColor(user.id || '0');
   
+  // Update local state when user prop changes
+  useEffect(() => {
+    setEditedUser({ ...user });
+  }, [user]);
+  
   const handleSave = () => {
     // Update user in auth context (and localStorage)
     updateUserProfile(editedUser);
@@ -41,6 +46,8 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
       title: "Profile updated",
       description: "Your profile has been updated successfully",
     });
+    
+    onClose();
   };
   
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {

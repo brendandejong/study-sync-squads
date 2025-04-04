@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import AvatarDisplay from './profile/AvatarDisplay';
 import AvatarDropdownMenu from './profile/AvatarDropdownMenu';
 import ProfileEditDialog from './profile/ProfileEditDialog';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserAvatarProps {
   user: User;
@@ -13,18 +14,13 @@ interface UserAvatarProps {
 
 const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [currentUser, setCurrentUser] = useState<User>({ ...user });
+  const { currentUser } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   // Ensure user object exists and has a name property before accessing it
-  if (!user || !user.name) {
+  if (!currentUser || !currentUser.name) {
     return null;
   }
-  
-  // Update currentUser whenever user prop changes
-  useEffect(() => {
-    setCurrentUser({ ...user });
-  }, [user]);
   
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
@@ -33,7 +29,6 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   };
 
   const handleSaveProfile = (updatedUser: User) => {
-    setCurrentUser({ ...updatedUser });
     setIsEditing(false);
   };
 

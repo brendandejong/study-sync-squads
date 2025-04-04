@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import Header from "@/components/Header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,14 @@ const Account = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(currentUser?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
+
+  // Update local state when currentUser changes
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.name);
+      setEmail(currentUser.email);
+    }
+  }, [currentUser]);
 
   const handleSaveProfile = () => {
     if (currentUser) {
