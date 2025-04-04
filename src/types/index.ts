@@ -1,9 +1,11 @@
-
 export interface User {
   id: string;
   name: string;
   avatar?: string;
   email: string;
+  bio?: string;
+  role?: string;
+  theme?: string;
 }
 
 export interface Course {

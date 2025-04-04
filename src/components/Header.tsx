@@ -51,7 +51,7 @@ const Header = () => {
           </Button>
           
           <div className="flex items-center">
-            <UserAvatar user={currentUser} size="sm" />
+            <UserAvatar user={currentUser} size="sm" showDropdown={true} />
           </div>
           
           <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
