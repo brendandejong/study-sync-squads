@@ -12,6 +12,7 @@ import { Settings, User as UserIcon, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials, getRandomColor } from '@/utils/helpers';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 interface AvatarDropdownMenuProps {
   user: User;
@@ -31,6 +32,12 @@ const AvatarDropdownMenu = ({
   onOpenChange
 }: AvatarDropdownMenuProps) => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
@@ -62,7 +69,10 @@ const AvatarDropdownMenu = ({
           <span>Settings</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
+        <DropdownMenuItem onSelect={(e) => {
+          e.preventDefault();
+          handleLogout();
+        }}>
           <LogOut className="mr-2 h-4 w-4" />
           <span>Log out</span>
         </DropdownMenuItem>
