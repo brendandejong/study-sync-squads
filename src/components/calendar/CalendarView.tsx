@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameDay, isSameMonth, addWeeks, subWeeks, addMonths, subMonths, startOfDay, endOfDay, isBefore, isAfter, isWithinInterval } from 'date-fns';
+import { format, startOfMonth, endOfMonth, startOfWeek, endOfWeek, addDays, isSameDay, isSameMonth, addWeeks, subWeeks, addMonths, subMonths, parseISO } from 'date-fns';
 import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { StudyGroup, TimeSlot } from '@/types';
 import { ChevronLeft, ChevronRight, Calendar as CalendarIcon } from 'lucide-react';
 import { formatTime } from '@/utils/helpers';
+import { useAuth } from '@/context/AuthContext';
 
 interface CalendarViewProps {
   studyGroups: StudyGroup[];
@@ -21,6 +22,12 @@ const shortWeekDays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const CalendarView: React.FC<CalendarViewProps> = ({ studyGroups }) => {
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const [viewType, setViewType] = useState<ViewType>('monthly');
+  const { currentUser } = useAuth();
+
+  // Filter study groups to only include those the user is a member of
+  const userStudyGroups = currentUser ? studyGroups.filter(group => 
+    group.members.some(member => member.id === currentUser.id)
+  ) : [];
 
   // Helper function to convert day string to number (0-6)
   const getDayNumber = (day: string): number => {
@@ -39,7 +46,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ studyGroups }) => {
 
   // Helper to check if a study group is scheduled for a given date
   const getScheduledGroups = (date: Date): StudyGroup[] => {
-    return studyGroups.filter(group => {
+    return userStudyGroups.filter(group => {
       return group.timeSlots.some(slot => {
         const dayNumber = getDayNumber(slot.day);
         return date.getDay() === dayNumber;

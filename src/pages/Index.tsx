@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Course, StudyGroup, StudyTag } from '@/types';
 import Header from '@/components/Header';
@@ -13,6 +14,7 @@ import { studyGroups as initialGroups, messages, currentUser } from '@/data/mock
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '@/context/AuthContext';
 
 interface IndexProps {
   myGroupsOnly?: boolean;
@@ -21,6 +23,7 @@ interface IndexProps {
 
 const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const { toast } = useToast();
+  const { currentUser } = useAuth();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -37,7 +40,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   }, [location.pathname]);
   
   const userGroups = studyGroups.filter(
-    g => g.members.some(m => m.id === currentUser.id)
+    g => g.members.some(m => m.id === (currentUser?.id ?? ''))
   );
   
   const handleGroupClick = (groupId: string) => {
@@ -63,6 +66,8 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   };
   
   const handleJoinGroup = (groupId: string) => {
+    if (!currentUser) return;
+    
     setStudyGroups(
       studyGroups.map(group => {
         if (group.id === groupId && !group.members.some(m => m.id === currentUser.id)) {
@@ -82,6 +87,8 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   };
   
   const handleLeaveGroup = (groupId: string) => {
+    if (!currentUser) return;
+    
     setStudyGroups(
       studyGroups.map(group => {
         if (group.id === groupId) {
@@ -111,7 +118,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
       return false;
     }
     
-    if (showMyGroups && !group.members.some(m => m.id === currentUser.id)) {
+    if (showMyGroups && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
       return false;
     }
     
@@ -137,7 +144,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
         
         {calendarView ? (
           <div className="bg-white rounded-lg shadow-card p-4 card-gradient">
-            <CalendarView studyGroups={userGroups.length > 0 ? userGroups : studyGroups} />
+            <CalendarView studyGroups={studyGroups} />
           </div>
         ) : (
           <>
