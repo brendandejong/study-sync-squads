@@ -2,19 +2,32 @@
 import { format } from 'date-fns';
 
 export const formatDate = (dateString: string): string => {
-  const date = new Date(dateString);
-  return format(date, 'MMM d, yyyy');
+  if (!dateString) return '';
+  try {
+    const date = new Date(dateString);
+    return format(date, 'MMM d, yyyy');
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return '';
+  }
 };
 
 export const formatTime = (timeString: string): string => {
-  // Convert 24-hour time to 12-hour format
-  const [hours, minutes] = timeString.split(':').map(Number);
-  const period = hours >= 12 ? 'PM' : 'AM';
-  const displayHours = hours % 12 || 12;
-  return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  if (!timeString) return '';
+  try {
+    // Convert 24-hour time to 12-hour format
+    const [hours, minutes] = timeString.split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  } catch (error) {
+    console.error('Error formatting time:', error);
+    return '';
+  }
 };
 
 export const getInitials = (name: string): string => {
+  if (!name) return '';
   return name
     .split(' ')
     .map(part => part[0])
@@ -23,6 +36,8 @@ export const getInitials = (name: string): string => {
 };
 
 export const getRandomColor = (id: string): string => {
+  if (!id) return 'bg-gray-500'; // Default color for missing IDs
+  
   // Generate a consistent color based on the id
   const colors = [
     'bg-blue-500',

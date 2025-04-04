@@ -9,8 +9,13 @@ interface UserAvatarProps {
 }
 
 const UserAvatar = ({ user, size = 'md' }: UserAvatarProps) => {
+  // Ensure user object exists and has a name property before accessing it
+  if (!user || !user.name) {
+    return null;
+  }
+  
   const initials = getInitials(user.name);
-  const bgColor = getRandomColor(user.id);
+  const bgColor = getRandomColor(user.id || '0');
   
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
