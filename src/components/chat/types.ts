@@ -16,3 +16,16 @@ export const INITIAL_MESSAGES: ChatMessage[] = [
     timestamp: new Date(),
   },
 ];
+
+export interface GeminiAPIResponse {
+  candidates: {
+    content: {
+      parts: {
+        text: string;
+      }[];
+    };
+  }[];
+  promptFeedback?: {
+    blockReason?: string;
+  };
+}

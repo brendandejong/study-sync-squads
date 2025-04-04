@@ -1,26 +1,30 @@
 
-// Function to fetch a response from OpenAI API
+import { GeminiAPIResponse } from './types';
+
+// Function to fetch a response from Gemini API
 export const fetchAIResponse = async (userInput: string, apiKey: string): Promise<string> => {
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`;
+  
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
-      model: "gpt-3.5-turbo",
-      messages: [
-        {
-          role: "system",
-          content: "You are a helpful study assistant. Provide concise, practical advice about studying, time management, coordination with study groups, and academic resources. Keep responses under 150 words and be supportive but direct."
-        },
+      contents: [
         {
           role: "user",
-          content: userInput
+          parts: [
+            {
+              text: "You are a helpful study assistant. Provide concise, practical advice about studying, time management, coordination with study groups, and academic resources. Keep responses under 150 words and be supportive but direct. Here's the user's query: " + userInput
+            }
+          ]
         }
       ],
-      max_tokens: 150,
-      temperature: 0.7
+      generationConfig: {
+        temperature: 0.7,
+        maxOutputTokens: 800,
+      }
     })
   });
   
@@ -29,8 +33,21 @@ export const fetchAIResponse = async (userInput: string, apiKey: string): Promis
     throw new Error(error.error?.message || 'Failed to fetch AI response');
   }
   
-  const data = await response.json();
-  return data.choices[0].message.content;
+  const data: GeminiAPIResponse = await response.json();
+  
+  // Check if the response was blocked by safety settings
+  if (data.promptFeedback?.blockReason) {
+    throw new Error(`Response blocked: ${data.promptFeedback.blockReason}`);
+  }
+  
+  // Extract the text from the response
+  if (data.candidates && data.candidates.length > 0 && 
+      data.candidates[0].content && data.candidates[0].content.parts && 
+      data.candidates[0].content.parts.length > 0) {
+    return data.candidates[0].content.parts[0].text;
+  }
+  
+  throw new Error('No valid response from Gemini API');
 };
 
 // Generate a local response based on user input (improved fallback)

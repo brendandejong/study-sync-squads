@@ -4,8 +4,8 @@ import { useToast } from '@/components/ui/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
 import { fetchAIResponse, generateLocalResponse } from './chatService';
 
-// Embedded API key - Using the provided key
-const EMBEDDED_API_KEY = "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";
+// Embedded API key for Gemini API - Replace this with your actual API key
+const EMBEDDED_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
 
 export const useChat = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,12 +46,19 @@ export const useChat = () => {
         try {
           response = await fetchAIResponse(input, EMBEDDED_API_KEY);
         } catch (error) {
-          console.error('Error with embedded API key:', error);
+          console.error('Error with Gemini API:', error);
           // Set flag to use local responses for future messages
           setIsUsingLocalResponses(true);
           usingLocalFallback = true;
           // Fallback to local response generation
           response = generateLocalResponse(input);
+          
+          // Show a notification about falling back to local responses
+          toast({
+            title: "Using offline mode",
+            description: "Unable to connect to Gemini AI service. Using enhanced local responses instead.",
+            variant: "default"
+          });
         }
       } else {
         // We already know we need to use local responses
@@ -70,15 +77,6 @@ export const useChat = () => {
             } 
           : msg
       ));
-      
-      // If this is the first time we're falling back to local responses, show a notification
-      if (usingLocalFallback && !isUsingLocalResponses) {
-        toast({
-          title: "Using offline mode",
-          description: "Unable to connect to AI service. Using enhanced local responses instead.",
-          variant: "default"
-        });
-      }
     } catch (error) {
       console.error('Error getting AI response:', error);
       
