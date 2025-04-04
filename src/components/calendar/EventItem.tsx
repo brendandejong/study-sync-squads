@@ -16,7 +16,6 @@ const EventItem: React.FC<EventItemProps> = ({ event, onClick, onDelete }) => {
       className="bg-indigo-100 text-indigo-800 p-1 mb-1 rounded text-xs truncate hover:bg-indigo-200 cursor-pointer group relative"
       title={`${event.title} (${event.startTime}-${event.endTime})`}
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation(); // Prevent parent container click events
         onClick(event, e);
       }}

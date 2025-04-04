@@ -31,7 +31,7 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
   let day = startDate;
   
   while (day <= endDate) {
-    days.push(day);
+    days.push(new Date(day));
     day = addDays(day, 1);
   }
   
@@ -65,17 +65,20 @@ const WeeklyView: React.FC<WeeklyViewProps> = ({
                   ? 'border-blue-500 border-2' 
                   : 'border-gray-200'
               } hover:bg-blue-50 cursor-pointer`}
-              onClick={() => onDayClick(date)}
+              onClick={() => onDayClick(new Date(date))}
             >
               <div className="font-medium text-right">{format(date, 'd')}</div>
               
               <div className="mt-1">
                 {dateEvents.length > 0 && 
-                  dateEvents.slice(0, 2).map(event => (
+                  dateEvents.map(event => (
                     <EventItem 
                       key={event.id}
                       event={event}
-                      onClick={onEventClick}
+                      onClick={(evt, e) => {
+                        if (e) e.stopPropagation();
+                        onEventClick(evt);
+                      }}
                       onDelete={onEventDelete}
                     />
                   ))

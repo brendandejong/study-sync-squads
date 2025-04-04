@@ -45,7 +45,7 @@ export function useCalendar(studyGroups: StudyGroup[]) {
   // Helper to get user events for a specific date
   const getEventsForDate = useCallback((date: Date): UserEvent[] => {
     return userEvents.filter(event => 
-      isSameDay(event.date, date)
+      isSameDay(new Date(event.date), date)
     );
   }, [userEvents]);
 
@@ -59,9 +59,12 @@ export function useCalendar(studyGroups: StudyGroup[]) {
 
   // Handle event click for viewing event details
   const handleEventClick = (event: UserEvent, e?: React.MouseEvent) => {
+    console.log('Event clicked:', event);
+    
+    // Prevent click event from propagating if needed
     if (e) {
       e.preventDefault();
-      e.stopPropagation(); // Prevent propagation to parent elements
+      e.stopPropagation();
     }
     
     // Set the selected event and date
@@ -71,8 +74,6 @@ export function useCalendar(studyGroups: StudyGroup[]) {
     // Set dialog mode to view and open the dialog
     setDialogMode("view");
     setIsEventDialogOpen(true);
-    
-    console.log('Event clicked:', event, 'Dialog should open in view mode');
   };
 
   // Handle edit mode

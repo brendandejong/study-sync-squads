@@ -52,17 +52,20 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({
               ? 'border-blue-500 border-2' 
               : 'border-gray-200'
           } hover:bg-blue-50 cursor-pointer`}
-          onClick={() => onDayClick(day)}
+          onClick={() => onDayClick(new Date(day))}
         >
           <div className="font-medium text-right">{format(day, 'd')}</div>
           
           <div className="mt-1 space-y-1">
             {dateEvents.length > 0 && 
-              dateEvents.slice(0, 1).map(event => (
+              dateEvents.map(event => (
                 <EventItem 
                   key={event.id}
                   event={event}
-                  onClick={onEventClick}
+                  onClick={(evt, e) => {
+                    if (e) e.stopPropagation();
+                    onEventClick(evt);
+                  }}
                   onDelete={onEventDelete}
                 />
               ))
@@ -81,7 +84,7 @@ const MonthlyView: React.FC<MonthlyViewProps> = ({
               </div>
             )}
             
-            {allItems.length > 1 && (
+            {allItems.length > 1 && dateEvents.length === 0 && scheduledGroups.length > 0 && (
               <div className="text-xs text-gray-500">+{allItems.length - 1} more</div>
             )}
           </div>

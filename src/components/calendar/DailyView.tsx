@@ -36,7 +36,7 @@ const DailyView: React.FC<DailyViewProps> = ({
         <Button 
           variant="outline" 
           size="sm" 
-          onClick={() => onAddEvent(currentDate)}
+          onClick={() => onAddEvent(new Date(currentDate))}
           className="flex items-center gap-1"
         >
           <Plus className="h-4 w-4" /> Add Event
@@ -51,7 +51,10 @@ const DailyView: React.FC<DailyViewProps> = ({
               <Card 
                 key={event.id} 
                 className="p-3 hover:shadow-md transition-shadow cursor-pointer mb-2 group relative"
-                onClick={() => onEventClick(event)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEventClick(event);
+                }}
               >
                 <div className="flex justify-between items-start">
                   <div>
@@ -116,7 +119,7 @@ const DailyView: React.FC<DailyViewProps> = ({
             <Button 
               variant="outline" 
               size="sm" 
-              onClick={() => onAddEvent(currentDate)}
+              onClick={() => onAddEvent(new Date(currentDate))}
               className="mt-4 flex items-center gap-1"
             >
               <Plus className="h-4 w-4" /> Add Event
