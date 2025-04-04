@@ -23,14 +23,24 @@ const Account = () => {
     if (currentUser) {
       setName(currentUser.name);
       setEmail(currentUser.email);
+      console.log("Account page received updated user:", currentUser);
     }
   }, [currentUser]);
 
   const handleSaveProfile = () => {
+    if (!name.trim()) {
+      toast({
+        variant: 'destructive',
+        title: "Invalid name",
+        description: "Name cannot be empty",
+      });
+      return;
+    }
+    
     if (currentUser) {
       const updatedUser = {
         ...currentUser,
-        name,
+        name: name.trim(),
         email
       };
       

@@ -33,11 +33,11 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   // Update local state when user prop changes
   useEffect(() => {
     setEditedUser({ ...user });
-  }, [user]);
+  }, [user, isOpen]); // Also update when dialog opens
   
   const handleSave = () => {
     // Validate that the name is not empty
-    if (!editedUser.name.trim()) {
+    if (!editedUser.name || !editedUser.name.trim()) {
       toast({
         variant: 'destructive',
         title: "Invalid name",
@@ -46,11 +46,17 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
       return;
     }
     
+    // Create a clean copy of the updated user
+    const updatedUser = {
+      ...editedUser,
+      name: editedUser.name.trim(),
+    };
+    
     // Update user in auth context (and localStorage)
-    updateUserProfile(editedUser);
+    updateUserProfile(updatedUser);
     
     // Call the onSave callback to update parent components
-    onSave(editedUser);
+    onSave(updatedUser);
     
     // Show success message
     toast({

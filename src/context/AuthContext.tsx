@@ -40,8 +40,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const updateUserProfile = (updatedUser: User) => {
     console.log('Updating user profile:', updatedUser);
-    setCurrentUser(updatedUser);
-    localStorage.setItem('user', JSON.stringify(updatedUser));
+    
+    // Make sure to create a new object to ensure state updates properly
+    const newUser = { ...updatedUser };
+    
+    // Update the state
+    setCurrentUser(newUser);
+    
+    // Persist to localStorage
+    localStorage.setItem('user', JSON.stringify(newUser));
+    
+    // Force update of localStorage in case there's a race condition
+    setTimeout(() => {
+      const savedUser = localStorage.getItem('user');
+      console.log('User saved in localStorage:', savedUser);
+    }, 100);
   };
 
   const login = async (email: string, password: string) => {
@@ -51,12 +64,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setTimeout(() => {
         // Simple validation for demo purposes
         if (email && password) {
-          const user: User = {
-            id: 'user-1',
-            name: 'Demo User',
-            email: email,
-            avatar: '',
-          };
+          // Check if there's a saved user with this email
+          const savedUser = localStorage.getItem('user');
+          let user: User;
+          
+          if (savedUser) {
+            try {
+              const parsedUser = JSON.parse(savedUser);
+              // If the email matches, use the saved user (preserves profile changes)
+              if (parsedUser.email === email) {
+                user = parsedUser;
+                console.log('Logging in with saved user profile:', user);
+              } else {
+                // If email doesn't match, create a new user
+                user = {
+                  id: 'user-1',
+                  name: 'Demo User',
+                  email: email,
+                  avatar: '',
+                };
+              }
+            } catch (error) {
+              // If parsing fails, create a new user
+              user = {
+                id: 'user-1',
+                name: 'Demo User',
+                email: email,
+                avatar: '',
+              };
+            }
+          } else {
+            // If no saved user, create a new one
+            user = {
+              id: 'user-1',
+              name: 'Demo User',
+              email: email,
+              avatar: '',
+            };
+          }
           
           setCurrentUser(user);
           setIsAuthenticated(true);
