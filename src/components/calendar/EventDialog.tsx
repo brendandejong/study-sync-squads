@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
@@ -32,7 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
-import { UserEvent } from "@/types";
+import { UserEvent } from "@/types/calendar";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
