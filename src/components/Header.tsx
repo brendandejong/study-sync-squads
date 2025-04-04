@@ -4,10 +4,13 @@ import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/UserAvatar';
 import { currentUser } from '@/data/mockData';
 import { Search, Bell, Menu, X } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const location = useLocation();
+  
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -18,9 +21,24 @@ const Header = () => {
           </Link>
           
           <nav className="hidden md:flex space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-primary font-medium">Dashboard</Link>
-            <Link to="/my-groups" className="text-gray-700 hover:text-primary font-medium">My Groups</Link>
-            <Link to="/calendar" className="text-gray-700 hover:text-primary font-medium">Calendar</Link>
+            <Link 
+              to="/" 
+              className={`font-medium transition-colors ${isActive('/') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/my-groups" 
+              className={`font-medium transition-colors ${isActive('/my-groups') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+            >
+              My Groups
+            </Link>
+            <Link 
+              to="/calendar" 
+              className={`font-medium transition-colors ${isActive('/calendar') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
+            >
+              Calendar
+            </Link>
           </nav>
         </div>
         
@@ -46,9 +64,27 @@ const Header = () => {
       {isMenuOpen && (
         <div className="md:hidden bg-white border-b border-gray-200">
           <nav className="container mx-auto px-4 py-3 flex flex-col space-y-4">
-            <Link to="/" className="text-gray-700 hover:text-primary font-medium" onClick={() => setIsMenuOpen(false)}>Dashboard</Link>
-            <Link to="/my-groups" className="text-gray-700 hover:text-primary font-medium" onClick={() => setIsMenuOpen(false)}>My Groups</Link>
-            <Link to="/calendar" className="text-gray-700 hover:text-primary font-medium" onClick={() => setIsMenuOpen(false)}>Calendar</Link>
+            <Link 
+              to="/" 
+              className={`font-medium ${isActive('/') ? 'text-primary' : 'text-gray-700'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              to="/my-groups" 
+              className={`font-medium ${isActive('/my-groups') ? 'text-primary' : 'text-gray-700'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              My Groups
+            </Link>
+            <Link 
+              to="/calendar" 
+              className={`font-medium ${isActive('/calendar') ? 'text-primary' : 'text-gray-700'}`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Calendar
+            </Link>
             <div className="flex items-center">
               <Button variant="ghost" size="icon">
                 <Search className="h-5 w-5 text-gray-500" />

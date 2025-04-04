@@ -116,10 +116,10 @@ const Index = ({ myGroupsOnly = false }: IndexProps) => {
       
       <main className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-bold">Find Your Perfect Study Group</h1>
+          <h1 className="text-2xl font-bold">Study Groups</h1>
           <Button onClick={() => setIsCreateModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
-            Create Study Group
+            Create Group
           </Button>
         </div>
         
@@ -129,30 +129,34 @@ const Index = ({ myGroupsOnly = false }: IndexProps) => {
             onValueChange={(value) => setShowMyGroups(value === "my-groups")}
             className="w-full"
           >
-            <TabsList className="w-full sm:w-auto">
-              <TabsTrigger value="all-groups" className="flex-1 sm:flex-none">All Groups ({studyGroups.length})</TabsTrigger>
-              <TabsTrigger value="my-groups" className="flex-1 sm:flex-none">My Groups ({userGroupsCount})</TabsTrigger>
+            <TabsList className="grid w-full md:w-80 grid-cols-2">
+              <TabsTrigger value="all-groups">All Groups</TabsTrigger>
+              <TabsTrigger value="my-groups">My Groups</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr] gap-6">
-          <FilterPanel 
-            selectedCourse={selectedCourse}
-            setSelectedCourse={setSelectedCourse}
-            activeFilters={activeFilters}
-            setActiveFilters={setActiveFilters}
-            studyGroupsCount={studyGroups.length}
-            userGroupsCount={userGroupsCount}
-          />
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <div>
+            <FilterPanel 
+              selectedCourse={selectedCourse}
+              setSelectedCourse={setSelectedCourse}
+              activeFilters={activeFilters}
+              setActiveFilters={setActiveFilters}
+              studyGroupsCount={filteredGroups.length}
+              userGroupsCount={userGroupsCount}
+            />
+          </div>
           
-          <StudyGroupList 
-            studyGroups={filteredGroups}
-            onGroupClick={handleGroupClick}
-            onCreateClick={() => setIsCreateModalOpen(true)}
-            selectedCourse={selectedCourse?.id || null}
-            activeFilters={activeFilters}
-          />
+          <div className="lg:col-span-3">
+            <StudyGroupList 
+              studyGroups={filteredGroups}
+              onGroupClick={handleGroupClick}
+              onCreateClick={() => setIsCreateModalOpen(true)}
+              selectedCourse={selectedCourse?.id || null}
+              activeFilters={activeFilters}
+            />
+          </div>
         </div>
       </main>
       
