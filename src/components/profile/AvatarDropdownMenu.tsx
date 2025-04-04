@@ -11,6 +11,7 @@ import {
 import { Settings, User as UserIcon, LogOut } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { getInitials, getRandomColor } from '@/utils/helpers';
+import { useNavigate } from 'react-router-dom';
 
 interface AvatarDropdownMenuProps {
   user: User;
@@ -29,6 +30,8 @@ const AvatarDropdownMenu = ({
   open,
   onOpenChange
 }: AvatarDropdownMenuProps) => {
+  const navigate = useNavigate();
+
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
@@ -51,7 +54,10 @@ const AvatarDropdownMenu = ({
           <UserIcon className="mr-2 h-4 w-4" />
           <span>Edit Profile</span>
         </DropdownMenuItem>
-        <DropdownMenuItem>
+        <DropdownMenuItem onSelect={(e) => {
+          e.preventDefault();
+          navigate('/account');
+        }}>
           <Settings className="mr-2 h-4 w-4" />
           <span>Settings</span>
         </DropdownMenuItem>
