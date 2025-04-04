@@ -43,10 +43,10 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[400px] p-0" align="start">
-          <Command>
-            <CommandInput placeholder="Search courses..." className="h-10" />
-            <CommandEmpty>No course found.</CommandEmpty>
-            {validCourses.length > 0 && (
+          {validCourses.length > 0 ? (
+            <Command>
+              <CommandInput placeholder="Search courses..." className="h-10" />
+              <CommandEmpty>No course found.</CommandEmpty>
               <CommandGroup>
                 {validCourses.map((course) => (
                   <CommandItem
@@ -68,8 +68,12 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
                   </CommandItem>
                 ))}
               </CommandGroup>
-            )}
-          </Command>
+            </Command>
+          ) : (
+            <div className="p-4 text-center">
+              <p>No courses available</p>
+            </div>
+          )}
         </PopoverContent>
       </Popover>
     </div>
