@@ -4,11 +4,14 @@ import { useToast } from '@/components/ui/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
 import { fetchAIResponse, generateLocalResponse } from './chatService';
 
+// Embedded API key - Note: In production, you would normally use environment variables
+// This is a placeholder and should be replaced with your actual API key
+const EMBEDDED_API_KEY = "sk-your-openai-api-key-here";
+
 export const useChat = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [isLoading, setIsLoading] = useState(false);
-  const [apiKey, setApiKey] = useState<string | null>(localStorage.getItem('studyAssistantApiKey'));
   const { toast } = useToast();
 
   const handleSendMessage = async (input: string) => {
@@ -36,10 +39,12 @@ export const useChat = () => {
     
     try {
       let response: string;
-      if (apiKey) {
-        // Call the OpenAI API
-        response = await fetchAIResponse(input, apiKey);
-      } else {
+      
+      // Try to use the embedded API key
+      try {
+        response = await fetchAIResponse(input, EMBEDDED_API_KEY);
+      } catch (error) {
+        console.error('Error with embedded API key:', error);
         // Fallback to local response generation
         response = generateLocalResponse(input);
       }
@@ -77,36 +82,13 @@ export const useChat = () => {
       setIsLoading(false);
     }
   };
-  
-  const handleSaveApiKey = () => {
-    const key = prompt("Enter your OpenAI API key to enable advanced AI responses:");
-    if (key) {
-      localStorage.setItem('studyAssistantApiKey', key);
-      setApiKey(key);
-      toast({
-        title: "API Key Saved",
-        description: "Your API key has been saved. The assistant will now use AI-powered responses.",
-      });
-    }
-  };
-  
-  const handleClearApiKey = () => {
-    localStorage.removeItem('studyAssistantApiKey');
-    setApiKey(null);
-    toast({
-      title: "API Key Removed",
-      description: "Your API key has been removed. The assistant will now use local responses.",
-    });
-  };
 
   return {
     isOpen,
     setIsOpen,
     messages,
     isLoading,
-    apiKey,
-    handleSendMessage,
-    handleSaveApiKey,
-    handleClearApiKey
+    apiKey: EMBEDDED_API_KEY, // Provide the embedded API key
+    handleSendMessage
   };
 };

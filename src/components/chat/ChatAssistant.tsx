@@ -14,10 +14,7 @@ const ChatAssistant = () => {
     setIsOpen, 
     messages, 
     isLoading, 
-    apiKey,
-    handleSendMessage, 
-    handleSaveApiKey, 
-    handleClearApiKey 
+    handleSendMessage
   } = useChat();
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -44,9 +41,6 @@ const ChatAssistant = () => {
           {/* Chat header */}
           <ChatHeader 
             onClose={() => setIsOpen(false)}
-            onSaveApiKey={handleSaveApiKey}
-            onClearApiKey={handleClearApiKey}
-            apiKey={apiKey}
           />
           
           {/* Chat messages */}
