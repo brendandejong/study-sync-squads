@@ -4,15 +4,16 @@ import { useAuth } from "@/context/AuthContext";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  redirectPath?: string;
 }
 
-const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children, redirectPath = "/login" }: ProtectedRouteProps) => {
   const { isAuthenticated } = useAuth();
   const location = useLocation();
 
   if (!isAuthenticated) {
     // Redirect to login page, but save the current location they were trying to access
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to={redirectPath} state={{ from: location }} replace />;
   }
 
   return <>{children}</>;

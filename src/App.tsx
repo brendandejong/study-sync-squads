@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import { ErrorBoundary } from "react-error-boundary";
 import { AuthProvider } from "./context/AuthContext";
@@ -31,6 +32,11 @@ const App = () => (
             <Routes>
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<Signup />} />
+              <Route path="/account" element={
+                <ProtectedRoute>
+                  <Account />
+                </ProtectedRoute>
+              } />
               <Route path="/" element={
                 <ProtectedRoute>
                   <Index />

@@ -1,6 +1,5 @@
-
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +13,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, LogIn } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,31 +22,32 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { login } = useAuth();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const from = location.state?.from?.pathname || "/account";
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
-    // Simulated login for demo
-    setTimeout(() => {
-      // For now, just simulate a successful login
-      // In a real app, you would validate credentials against a backend
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify({
-        id: "user-1",
-        name: "Demo User",
-        email: email,
-        avatar: "",
-      }));
-      
+    try {
+      await login(email, password);
       toast({
         title: "Login successful",
         description: "Welcome back!",
       });
       
+      navigate(from, { replace: true });
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: error instanceof Error ? error.message : "An error occurred",
+      });
+    } finally {
       setIsLoading(false);
-      navigate("/");
-    }, 1000);
+    }
   };
 
   return (
