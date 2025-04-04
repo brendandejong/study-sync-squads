@@ -1,11 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
 import { fetchAIResponse, generateLocalResponse } from './chatService';
 
 // Embedded API key for Gemini API - Replace this with your actual API key
-const EMBEDDED_API_KEY = "YOUR_GEMINI_API_KEY_HERE";
+const EMBEDDED_API_KEY = "AIzaSyAB5URZseUfBH8OsaJA9hHVh4jlgI6HA24";
 
 export const useChat = () => {
   const [isOpen, setIsOpen] = useState(false);
