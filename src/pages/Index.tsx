@@ -6,8 +6,9 @@ import FilterPanel from '@/components/study-groups/FilterPanel';
 import StudyGroupList from '@/components/study-groups/StudyGroupList';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupDetails from '@/components/GroupDetails';
+import CalendarView from '@/components/calendar/CalendarView';
 import { Button } from '@/components/ui/button';
-import { Plus } from 'lucide-react';
+import { Plus, Calendar } from 'lucide-react';
 import { studyGroups as initialGroups, messages, currentUser } from '@/data/mockData';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -36,6 +37,11 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   useEffect(() => {
     setShowMyGroups(location.pathname === '/my-groups');
   }, [location.pathname]);
+  
+  // Get user's groups for filtering
+  const userGroups = studyGroups.filter(
+    g => g.members.some(m => m.id === currentUser.id)
+  );
   
   const handleGroupClick = (groupId: string) => {
     const group = studyGroups.find(g => g.id === groupId);
@@ -97,9 +103,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
     });
   };
 
-  const userGroupsCount = studyGroups.filter(
-    g => g.members.some(m => m.id === currentUser.id)
-  ).length;
+  const userGroupsCount = userGroups.length;
 
   const filteredGroups = studyGroups.filter(group => {
     // Course filter
@@ -127,7 +131,9 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
       <main className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <h1 className="text-2xl font-bold">
-            {showMyGroups ? "My Study Groups" : "Study Groups"}
+            {calendarView 
+              ? "Calendar View" 
+              : (showMyGroups ? "My Study Groups" : "Study Groups")}
           </h1>
           <Button onClick={() => setIsCreateModalOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
@@ -135,41 +141,49 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
           </Button>
         </div>
         
-        <div className="mb-6">
-          <Tabs 
-            value={showMyGroups ? "my-groups" : "all-groups"} 
-            onValueChange={(value) => setShowMyGroups(value === "my-groups")}
-            className="w-full"
-          >
-            <TabsList className="grid w-full md:w-80 grid-cols-2">
-              <TabsTrigger value="all-groups">All Groups</TabsTrigger>
-              <TabsTrigger value="my-groups">My Groups ({userGroupsCount})</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <div>
-            <FilterPanel 
-              selectedCourse={selectedCourse}
-              setSelectedCourse={setSelectedCourse}
-              activeFilters={activeFilters}
-              setActiveFilters={setActiveFilters}
-              studyGroupsCount={filteredGroups.length}
-              userGroupsCount={userGroupsCount}
-            />
+        {calendarView ? (
+          <div className="bg-white rounded-lg shadow p-4">
+            <CalendarView studyGroups={userGroups.length > 0 ? userGroups : studyGroups} />
           </div>
-          
-          <div className="lg:col-span-3">
-            <StudyGroupList 
-              studyGroups={filteredGroups}
-              onGroupClick={handleGroupClick}
-              onCreateClick={() => setIsCreateModalOpen(true)}
-              selectedCourse={selectedCourse?.id || null}
-              activeFilters={activeFilters}
-            />
-          </div>
-        </div>
+        ) : (
+          <>
+            <div className="mb-6">
+              <Tabs 
+                value={showMyGroups ? "my-groups" : "all-groups"} 
+                onValueChange={(value) => setShowMyGroups(value === "my-groups")}
+                className="w-full"
+              >
+                <TabsList className="grid w-full md:w-80 grid-cols-2">
+                  <TabsTrigger value="all-groups">All Groups</TabsTrigger>
+                  <TabsTrigger value="my-groups">My Groups ({userGroupsCount})</TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
+            
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+              <div>
+                <FilterPanel 
+                  selectedCourse={selectedCourse}
+                  setSelectedCourse={setSelectedCourse}
+                  activeFilters={activeFilters}
+                  setActiveFilters={setActiveFilters}
+                  studyGroupsCount={filteredGroups.length}
+                  userGroupsCount={userGroupsCount}
+                />
+              </div>
+              
+              <div className="lg:col-span-3">
+                <StudyGroupList 
+                  studyGroups={filteredGroups}
+                  onGroupClick={handleGroupClick}
+                  onCreateClick={() => setIsCreateModalOpen(true)}
+                  selectedCourse={selectedCourse?.id || null}
+                  activeFilters={activeFilters}
+                />
+              </div>
+            </div>
+          </>
+        )}
       </main>
       
       <CreateGroupModal
