@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
-import { Settings, User as UserIcon, LogOut } from 'lucide-react';
+import { Settings, User as UserIcon, LogOut, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
@@ -97,12 +97,15 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
         <DropdownMenuSeparator />
         <Popover open={isEditing} onOpenChange={setIsEditing}>
           <PopoverTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <DropdownMenuItem onSelect={(e) => {
+              e.preventDefault();
+              setIsEditing(true);
+            }}>
               <UserIcon className="mr-2 h-4 w-4" />
               <span>Edit Profile</span>
             </DropdownMenuItem>
           </PopoverTrigger>
-          <PopoverContent className="w-80 p-4">
+          <PopoverContent className="w-80 p-4" forceMount>
             <div className="space-y-4">
               <h4 className="font-medium text-sm">Edit Your Profile</h4>
               <div className="flex flex-col space-y-2">
@@ -132,6 +135,16 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
                   value={editedUser.name} 
                   onChange={(e) => setEditedUser({...editedUser, name: e.target.value})}
                 />
+                
+                <label className="text-xs">Email</label>
+                <Input 
+                  value={editedUser.email} 
+                  onChange={(e) => setEditedUser({...editedUser, email: e.target.value})}
+                  type="email"
+                  placeholder="your@email.com"
+                  className="mb-2"
+                />
+
                 <label className="text-xs">Bio</label>
                 <Input 
                   value={editedUser.bio || ''} 
