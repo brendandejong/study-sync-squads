@@ -15,7 +15,10 @@ const EventItem: React.FC<EventItemProps> = ({ event, onClick, onDelete }) => {
       key={event.id} 
       className="bg-indigo-100 text-indigo-800 p-1 mb-1 rounded text-xs truncate hover:bg-indigo-200 cursor-pointer group relative"
       title={`${event.title} (${event.startTime}-${event.endTime})`}
-      onClick={(e) => onClick(event, e)}
+      onClick={(e) => {
+        e.stopPropagation(); // Prevent parent container click events
+        onClick(event, e);
+      }}
     >
       <div className="flex justify-between items-center">
         <span className="truncate">{event.title}</span>
