@@ -80,6 +80,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setTimeout(() => {
         // Simple validation for demo purposes
         if (name && email && password) {
+          // Clear all existing local storage data to ensure a fresh start
+          const keysToPreserve = ['theme', 'prefersColorScheme'];
+          
+          // Get all localStorage keys
+          const allKeys = Object.keys(localStorage);
+          
+          // Remove all app-related data, preserving only system settings
+          allKeys.forEach(key => {
+            if (!keysToPreserve.includes(key)) {
+              localStorage.removeItem(key);
+            }
+          });
+          
           const user: User = {
             id: `user-${Date.now()}`,
             name: name,
@@ -87,6 +100,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             avatar: '',
           };
           
+          // Initialize empty data collections
+          localStorage.setItem('studyGoals', JSON.stringify([]));
+          localStorage.setItem('studySessions', JSON.stringify([]));
+          localStorage.setItem('studyStats', JSON.stringify({
+            totalHours: 0,
+            weeklyHours: 0,
+            monthlyHours: 0,
+            preferredStudyType: "",
+            preferredTime: "",
+            streak: 0,
+            mostStudiedCourse: ""
+          }));
+          localStorage.setItem('userCourses', JSON.stringify([]));
+          localStorage.setItem('userEvents', JSON.stringify([]));
+          
+          // Set current user and authentication state
           setCurrentUser(user);
           setIsAuthenticated(true);
           localStorage.setItem('isLoggedIn', 'true');

@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, UserPlus } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -24,8 +25,9 @@ const Signup = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signup } = useAuth();
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (password !== confirmPassword) {
@@ -39,26 +41,18 @@ const Signup = () => {
     
     setIsLoading(true);
     
-    // Simulated signup for demo
-    setTimeout(() => {
-      // For now, just simulate a successful signup
-      // In a real app, you would send this data to your backend
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("user", JSON.stringify({
-        id: "user-1",
-        name: name,
-        email: email,
-        avatar: "",
-      }));
-      
-      toast({
-        title: "Account created",
-        description: "Your account has been successfully created!",
-      });
-      
-      setIsLoading(false);
+    try {
+      await signup(name, email, password);
       navigate("/");
-    }, 1000);
+    } catch (error) {
+      toast({
+        variant: "destructive",
+        title: "Signup failed",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

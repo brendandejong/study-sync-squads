@@ -3,12 +3,11 @@ import React from 'react';
 import { Clock, BookOpen, Target, Flame } from 'lucide-react';
 import StatsCard from './StatsCard';
 import { StudyStats } from '@/hooks/useStats';
-import { CoursesType } from '@/hooks/useCourses';
 
 interface StatsOverviewProps {
   stats: StudyStats;
   goals: any[];
-  courses: CoursesType;
+  courses: any[]; // Changed from CoursesType to any[]
   onEditStats: () => void;
 }
 
