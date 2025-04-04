@@ -12,9 +12,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, MapPin, MessageSquare, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, MessageSquare, Users, Send } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { currentUser } from '@/data/mockData';
+import { useToast } from '@/components/ui/use-toast';
 
 interface GroupDetailsProps {
   group: StudyGroup | null;
@@ -27,13 +28,15 @@ interface GroupDetailsProps {
 
 const GroupDetails = ({
   group,
-  messages,
+  messages: initialMessages,
   isOpen,
   onClose,
   onJoinGroup,
   onLeaveGroup,
 }: GroupDetailsProps) => {
   const [newMessage, setNewMessage] = useState('');
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { toast } = useToast();
   
   if (!group) return null;
   
@@ -42,9 +45,26 @@ const GroupDetails = ({
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would send the message to the server
-    console.log('Sending message:', newMessage);
+    if (!newMessage.trim() || !isCurrentUserMember) return;
+    
+    const newMessageObj: Message = {
+      id: `msg-${Date.now()}`,
+      groupId: group.id,
+      userId: currentUser.id,
+      user: currentUser,
+      content: newMessage,
+      timestamp: new Date().toISOString(),
+    };
+    
+    // Update local state with the new message
+    setMessages(prev => [...prev, newMessageObj]);
     setNewMessage('');
+    
+    // In a real app, this would send the message to the server
+    toast({
+      description: "Message sent successfully",
+      duration: 2000,
+    });
   };
 
   return (
@@ -178,7 +198,10 @@ const GroupDetails = ({
                     onChange={(e) => setNewMessage(e.target.value)}
                     className="flex-1"
                   />
-                  <Button type="submit" disabled={!newMessage.trim()}>Send</Button>
+                  <Button type="submit" disabled={!newMessage.trim()}>
+                    <Send className="h-4 w-4 mr-2" />
+                    Send
+                  </Button>
                 </form>
               ) : (
                 <div className="text-center py-4 bg-gray-50 rounded">
