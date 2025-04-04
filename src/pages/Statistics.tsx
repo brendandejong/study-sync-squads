@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import Header from '@/components/Header';
 import { useStats, StudyGoal } from '@/hooks/useStats';
@@ -296,8 +297,8 @@ const Insights = () => {
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="card-gradient">
-                <CardHeader>
+              <Card className="card-gradient h-[400px] md:h-[350px]">
+                <CardHeader className="pb-0">
                   <div className="flex justify-between items-center">
                     <CardTitle className="flex items-center">
                       <BarChartIcon className="mr-2 h-5 w-5 text-blue-500" />
@@ -314,14 +315,14 @@ const Insights = () => {
                   </div>
                   <CardDescription>Hours studied per day this week</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[250px] w-full">
+                <CardContent className="pt-2 h-[calc(100%-70px)]">
+                  <div className="w-full h-full">
                     <ChartContainer 
                       config={{
                         hours: { color: "#93c5fd" }
                       }}
                     >
-                      <BarChart data={weeklyProgressData}>
+                      <BarChart data={weeklyProgressData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
                         <XAxis dataKey="name" />
                         <YAxis />
                         <Tooltip content={<ChartTooltipContent />} />
@@ -332,8 +333,8 @@ const Insights = () => {
                 </CardContent>
               </Card>
               
-              <Card className="card-gradient">
-                <CardHeader>
+              <Card className="card-gradient h-[400px] md:h-[350px]">
+                <CardHeader className="pb-0">
                   <div className="flex justify-between items-center">
                     <CardTitle className="flex items-center">
                       <Calendar className="mr-2 h-5 w-5 text-purple-500" />
@@ -350,10 +351,10 @@ const Insights = () => {
                   </div>
                   <CardDescription>Your preferred study methods</CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="h-[250px] w-full flex justify-center items-center">
+                <CardContent className="pt-2 h-[calc(100%-70px)]">
+                  <div className="w-full h-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
+                      <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                         <Pie
                           data={studyTypeData}
                           cx="50%"
