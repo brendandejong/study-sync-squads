@@ -1,3 +1,4 @@
+
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -25,8 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     if (isLoggedIn && savedUser) {
       try {
-        setCurrentUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+        setCurrentUser(parsedUser);
         setIsAuthenticated(true);
+        console.log('Loaded user from localStorage:', parsedUser);
       } catch (error) {
         console.error('Error parsing saved user:', error);
         localStorage.removeItem('user');
@@ -36,6 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const updateUserProfile = (updatedUser: User) => {
+    console.log('Updating user profile:', updatedUser);
     setCurrentUser(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));
   };

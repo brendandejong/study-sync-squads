@@ -36,12 +36,23 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   }, [user]);
   
   const handleSave = () => {
+    // Validate that the name is not empty
+    if (!editedUser.name.trim()) {
+      toast({
+        variant: 'destructive',
+        title: "Invalid name",
+        description: "Name cannot be empty",
+      });
+      return;
+    }
+    
     // Update user in auth context (and localStorage)
     updateUserProfile(editedUser);
     
-    // Update local state in the component
+    // Call the onSave callback to update parent components
     onSave(editedUser);
     
+    // Show success message
     toast({
       title: "Profile updated",
       description: "Your profile has been updated successfully",

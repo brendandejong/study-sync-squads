@@ -1,6 +1,6 @@
 
 import { User } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AvatarDisplay from './profile/AvatarDisplay';
 import AvatarDropdownMenu from './profile/AvatarDropdownMenu';
 import ProfileEditDialog from './profile/ProfileEditDialog';
@@ -14,7 +14,7 @@ interface UserAvatarProps {
 
 const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps) => {
   const [isEditing, setIsEditing] = useState(false);
-  const { currentUser } = useAuth();
+  const { currentUser, updateUserProfile } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
   // Ensure user object exists and has a name property before accessing it
@@ -29,6 +29,8 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   };
 
   const handleSaveProfile = (updatedUser: User) => {
+    // Update the user in context and localStorage
+    updateUserProfile(updatedUser);
     setIsEditing(false);
   };
 
