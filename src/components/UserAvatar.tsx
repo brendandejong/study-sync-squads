@@ -11,13 +11,14 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Settings, User as UserIcon, LogOut, Mail } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { 
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
   DialogClose
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -33,6 +34,7 @@ interface UserAvatarProps {
 const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState<User>({ ...user });
+  const [currentUser, setCurrentUser] = useState<User>({ ...user });
   const { toast } = useToast();
   
   // Ensure user object exists and has a name property before accessing it
@@ -40,8 +42,13 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
     return null;
   }
   
-  const initials = getInitials(user.name);
-  const bgColor = getRandomColor(user.id || '0');
+  // Update currentUser whenever user prop changes
+  useEffect(() => {
+    setCurrentUser({ ...user });
+  }, [user]);
+  
+  const initials = getInitials(currentUser.name);
+  const bgColor = getRandomColor(currentUser.id || '0');
   
   const sizeClasses = {
     sm: 'h-8 w-8 text-xs',
@@ -50,13 +57,19 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   };
 
   const handleSaveProfile = () => {
-    // In a real app, this would save to the server
-    // For now, we'll just show a success message
+    // Apply the edited user data to the current user
+    setCurrentUser({ ...editedUser });
     setIsEditing(false);
     toast({
       title: "Profile updated",
       description: "Your profile has been updated successfully",
     });
+  };
+
+  const handleEditOpen = () => {
+    // Reset the edited user data to current user data when opening
+    setEditedUser({ ...currentUser });
+    setIsEditing(true);
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -76,7 +89,7 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
 
   const avatarDisplay = (
     <Avatar className={sizeClasses[size]}>
-      <AvatarImage src={user.avatar} alt={user.name} />
+      <AvatarImage src={currentUser.avatar} alt={currentUser.name} />
       <AvatarFallback className={bgColor}>
         {initials}
       </AvatarFallback>
@@ -98,14 +111,14 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
         <DropdownMenuContent align="end" className="w-56">
           <DropdownMenuLabel className="font-normal">
             <div className="flex flex-col space-y-1">
-              <p className="text-sm font-medium leading-none">{user.name}</p>
-              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+              <p className="text-sm font-medium leading-none">{currentUser.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">{currentUser.email}</p>
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={(e) => {
             e.preventDefault();
-            setIsEditing(true);
+            handleEditOpen();
           }}>
             <UserIcon className="mr-2 h-4 w-4" />
             <span>Edit Profile</span>
@@ -122,11 +135,13 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
         </DropdownMenuContent>
       </DropdownMenu>
 
-      {/* Profile edit dialog that won't disappear on mouse movement */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>Edit Your Profile</DialogTitle>
+            <DialogDescription>
+              Make changes to your profile here. Click save when you're done.
+            </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex justify-center mb-2">
