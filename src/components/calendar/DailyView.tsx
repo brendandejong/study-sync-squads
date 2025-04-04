@@ -64,7 +64,10 @@ const DailyView: React.FC<DailyViewProps> = ({
                     </p>
                     <button
                       className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 ml-2"
-                      onClick={(e) => onEventDelete(event, e)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Stop event propagation
+                        onEventDelete(event, e);
+                      }}
                       title="Delete event"
                     >
                       <Trash2 className="h-4 w-4" />

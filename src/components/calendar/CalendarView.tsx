@@ -71,18 +71,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ studyGroups }) => {
           />
         );
       case 'monthly':
-        return (
-          <MonthlyView 
-            currentDate={currentDate}
-            events={[]} // Not used directly in component
-            studyGroups={[]} // Not used directly in component
-            onDayClick={handleDayClick}
-            onEventClick={handleEventClick}
-            onEventDelete={handleQuickDeleteEvent}
-            getEventsForDate={getEventsForDate}
-            getScheduledGroups={getScheduledGroups}
-          />
-        );
       default:
         return (
           <MonthlyView 

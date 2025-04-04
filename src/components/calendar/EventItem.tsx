@@ -21,7 +21,10 @@ const EventItem: React.FC<EventItemProps> = ({ event, onClick, onDelete }) => {
         <span className="truncate">{event.title}</span>
         <button
           className="opacity-0 group-hover:opacity-100 transition-opacity text-red-500 hover:text-red-700 ml-1"
-          onClick={(e) => onDelete(event, e)}
+          onClick={(e) => {
+            e.stopPropagation(); // Stop event propagation
+            onDelete(event, e);
+          }}
           title="Delete event"
         >
           <Trash2 className="h-3 w-3" />

@@ -61,8 +61,14 @@ export function useCalendar(studyGroups: StudyGroup[]) {
   const handleEventClick = (event: UserEvent, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     setSelectedEvent(event);
+    setSelectedDate(new Date(event.date)); // Ensure the selected date is set
     setDialogMode("view");
     setIsEventDialogOpen(true);
+  };
+
+  // Handle edit mode
+  const handleEditEvent = () => {
+    setDialogMode("edit");
   };
 
   // Handle event creation or update
@@ -155,6 +161,7 @@ export function useCalendar(studyGroups: StudyGroup[]) {
     getEventsForDate,
     handleDayClick,
     handleEventClick,
+    handleEditEvent,
     handleSaveEvent,
     handleDeleteEvent,
     handleQuickDeleteEvent,

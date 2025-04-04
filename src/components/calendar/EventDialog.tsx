@@ -1,6 +1,6 @@
 
 import * as React from "react";
-import { Trash2 } from "lucide-react";
+import { Trash2, Edit } from "lucide-react";
 
 import {
   Dialog,
@@ -34,9 +34,16 @@ const EventDialog: React.FC<EventDialogProps> = ({
   event,
   mode = "create",
 }) => {
-  const isViewMode = mode === "view";
-  const isEditMode = mode === "edit";
-  const isCreateMode = mode === "create";
+  const [internalMode, setInternalMode] = React.useState(mode);
+  
+  // Update internal mode when external mode changes
+  React.useEffect(() => {
+    setInternalMode(mode);
+  }, [mode]);
+  
+  const isViewMode = internalMode === "view";
+  const isEditMode = internalMode === "edit";
+  const isCreateMode = internalMode === "create";
   
   const dialogTitle = isCreateMode 
     ? "Add New Event" 
@@ -79,6 +86,10 @@ const EventDialog: React.FC<EventDialogProps> = ({
       onClose();
     }
   };
+  
+  const handleEdit = () => {
+    setInternalMode("edit");
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -97,16 +108,27 @@ const EventDialog: React.FC<EventDialogProps> = ({
         />
 
         <DialogFooter>
-          {isViewMode && event?.id && onDelete && (
-            <Button 
-              type="button" 
-              variant="destructive" 
-              onClick={handleDelete}
-              className="mr-auto"
-            >
-              <Trash2 className="h-4 w-4 mr-1" />
-              Delete
-            </Button>
+          {isViewMode && event?.id && (
+            <div className="flex gap-2 mr-auto">
+              {onDelete && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  onClick={handleDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              )}
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={handleEdit}
+              >
+                <Edit className="h-4 w-4 mr-1" />
+                Edit
+              </Button>
+            </div>
           )}
           
           <Button type="button" variant="outline" onClick={onClose}>
