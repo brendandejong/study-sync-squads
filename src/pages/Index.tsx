@@ -119,24 +119,24 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-blue">
       <Header />
       
       <main className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <h1 className="text-2xl font-bold">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 p-4 rounded-lg bg-white bg-opacity-70 backdrop-blur-sm shadow-sm">
+          <h1 className="text-2xl font-bold text-blue-800">
             {calendarView 
               ? "Calendar View" 
               : (showMyGroups ? "My Study Groups" : "Study Groups")}
           </h1>
-          <Button onClick={() => setIsCreateModalOpen(true)}>
+          <Button onClick={() => setIsCreateModalOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 btn-hover-effect">
             <Plus className="h-4 w-4 mr-2" />
             Create Group
           </Button>
         </div>
         
         {calendarView ? (
-          <div className="bg-white rounded-lg shadow p-4">
+          <div className="bg-white rounded-lg shadow-card p-4 card-gradient">
             <CalendarView studyGroups={userGroups.length > 0 ? userGroups : studyGroups} />
           </div>
         ) : (
@@ -147,9 +147,9 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
                 onValueChange={(value) => setShowMyGroups(value === "my-groups")}
                 className="w-full"
               >
-                <TabsList className="grid w-full md:w-80 grid-cols-2">
-                  <TabsTrigger value="all-groups">All Groups</TabsTrigger>
-                  <TabsTrigger value="my-groups">My Groups ({userGroupsCount})</TabsTrigger>
+                <TabsList className="grid w-full md:w-80 grid-cols-2 bg-blue-50">
+                  <TabsTrigger value="all-groups" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800">All Groups</TabsTrigger>
+                  <TabsTrigger value="my-groups" className="data-[state=active]:bg-blue-100 data-[state=active]:text-blue-800">My Groups ({userGroupsCount})</TabsTrigger>
                 </TabsList>
               </Tabs>
             </div>

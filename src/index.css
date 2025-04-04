@@ -5,7 +5,7 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 40% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -73,54 +73,79 @@
   }
   body {
     @apply bg-background text-foreground;
+    background-image: linear-gradient(to right, rgba(240, 249, 255, 0.4) 0%, rgba(224, 242, 254, 0.2) 100%);
   }
 }
 
-/* Subject color indicators */
+/* Subject color indicators with improved colors */
 .subject-math {
   @apply bg-blue-500;
 }
 .subject-science {
-  @apply bg-green-500;
+  @apply bg-emerald-500;
 }
 .subject-history {
-  @apply bg-yellow-500;
+  @apply bg-amber-500;
 }
 .subject-language {
-  @apply bg-purple-500;
+  @apply bg-indigo-500;
 }
 .subject-computer {
-  @apply bg-cyan-500;
+  @apply bg-sky-500;
 }
 .subject-business {
   @apply bg-orange-500;
 }
 .subject-art {
-  @apply bg-pink-500;
+  @apply bg-fuchsia-500;
 }
 .subject-engineering {
-  @apply bg-red-500;
+  @apply bg-rose-500;
 }
 .subject-health {
-  @apply bg-emerald-500;
+  @apply bg-teal-500;
 }
 .subject-other {
-  @apply bg-gray-500;
+  @apply bg-slate-500;
 }
 
-/* Study group tags */
+/* Study group tags with more vibrant colors */
 .tag-quiet {
-  @apply bg-blue-100 text-blue-800;
+  @apply bg-blue-100 text-blue-800 border border-blue-200;
 }
 .tag-flashcards {
-  @apply bg-green-100 text-green-800;
+  @apply bg-green-100 text-green-800 border border-green-200;
 }
 .tag-exam {
-  @apply bg-red-100 text-red-800;
+  @apply bg-red-100 text-red-800 border border-red-200;
 }
 .tag-discussion {
-  @apply bg-purple-100 text-purple-800;
+  @apply bg-purple-100 text-purple-800 border border-purple-200;
 }
 .tag-practice {
-  @apply bg-yellow-100 text-yellow-800;
+  @apply bg-yellow-100 text-yellow-800 border border-yellow-200;
+}
+
+/* Card enhancements */
+.card-gradient {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.card-gradient:hover {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  transform: translateY(-2px);
+}
+
+/* Header styling */
+.app-header {
+  background: linear-gradient(90deg, #f0f9ff 0%, #e0f2fe 100%);
+  border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+}
+
+/* Button hover effects */
+.btn-hover-effect:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
