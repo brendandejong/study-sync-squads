@@ -8,21 +8,38 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Mail, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const Account = () => {
-  const { currentUser, logout } = useAuth();
+  const { currentUser, logout, updateUserProfile } = useAuth();
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(currentUser?.name || "");
   const [email, setEmail] = useState(currentUser?.email || "");
 
   const handleSaveProfile = () => {
-    // In a real app, you would save this to your backend
-    toast({
-      title: "Profile updated",
-      description: "Your profile has been updated successfully.",
-    });
-    setIsEditing(false);
+    if (currentUser) {
+      const updatedUser = {
+        ...currentUser,
+        name,
+        email
+      };
+      
+      // Update user profile in AuthContext (and localStorage)
+      updateUserProfile(updatedUser);
+      
+      toast({
+        title: "Profile updated",
+        description: "Your profile has been updated successfully.",
+      });
+      setIsEditing(false);
+    }
+  };
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
   };
 
   return (
@@ -130,7 +147,7 @@ const Account = () => {
                   <Button 
                     variant="outline" 
                     className="w-full justify-start text-red-500 hover:text-red-600 hover:bg-red-50"
-                    onClick={logout}
+                    onClick={handleLogout}
                   >
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 

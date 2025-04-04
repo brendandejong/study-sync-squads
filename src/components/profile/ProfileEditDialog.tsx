@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Settings } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/context/AuthContext';
 
 interface ProfileEditDialogProps {
   isOpen: boolean;
@@ -26,10 +27,16 @@ interface ProfileEditDialogProps {
 const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogProps) => {
   const [editedUser, setEditedUser] = useState<User>({ ...user });
   const { toast } = useToast();
+  const { updateUserProfile } = useAuth();
   const bgColor = getRandomColor(user.id || '0');
   
   const handleSave = () => {
+    // Update user in auth context (and localStorage)
+    updateUserProfile(editedUser);
+    
+    // Update local state in the component
     onSave(editedUser);
+    
     toast({
       title: "Profile updated",
       description: "Your profile has been updated successfully",

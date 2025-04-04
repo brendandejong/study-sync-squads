@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -9,6 +8,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
+  updateUserProfile: (updatedUser: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -34,6 +34,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, []);
+
+  const updateUserProfile = (updatedUser: User) => {
+    setCurrentUser(updatedUser);
+    localStorage.setItem('user', JSON.stringify(updatedUser));
+  };
 
   const login = async (email: string, password: string) => {
     // This is a mock implementation
@@ -160,6 +165,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         login,
         signup,
         logout,
+        updateUserProfile,
       }}
     >
       {children}
