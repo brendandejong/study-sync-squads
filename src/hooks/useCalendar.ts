@@ -60,6 +60,7 @@ export function useCalendar(studyGroups: StudyGroup[]) {
   // Handle event click for viewing event details
   const handleEventClick = (event: UserEvent, e?: React.MouseEvent) => {
     if (e) {
+      e.preventDefault();
       e.stopPropagation(); // Prevent propagation to parent elements
     }
     
@@ -67,9 +68,11 @@ export function useCalendar(studyGroups: StudyGroup[]) {
     setSelectedEvent(event);
     setSelectedDate(new Date(event.date));
     
-    // Set dialog mode to view
+    // Set dialog mode to view and open the dialog
     setDialogMode("view");
     setIsEventDialogOpen(true);
+    
+    console.log('Event clicked:', event, 'Dialog should open in view mode');
   };
 
   // Handle edit mode
@@ -125,6 +128,7 @@ export function useCalendar(studyGroups: StudyGroup[]) {
 
   // Handle quick delete event
   const handleQuickDeleteEvent = (event: UserEvent, e: React.MouseEvent) => {
+    e.preventDefault();
     e.stopPropagation(); // This is critical to prevent the event click handler from firing
     handleDeleteEvent(event.id);
   };
