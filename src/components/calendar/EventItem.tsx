@@ -31,6 +31,7 @@ const EventItem: React.FC<EventItemProps> = ({ event, onClick, onDelete }) => {
             onDelete(event, e);
           }}
           title="Delete event"
+          aria-label="Delete event"
         >
           <Trash2 className="h-3 w-3" />
         </button>
