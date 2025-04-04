@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger 
 } from '@/components/ui/dropdown-menu';
 import { Settings, User as UserIcon, LogOut, Mail } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { 
   Dialog,
   DialogContent,
@@ -35,6 +35,7 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState<User>({ ...user });
   const [currentUser, setCurrentUser] = useState<User>({ ...user });
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const { toast } = useToast();
   
   // Ensure user object exists and has a name property before accessing it
@@ -70,6 +71,8 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
     // Reset the edited user data to current user data when opening
     setEditedUser({ ...currentUser });
     setIsEditing(true);
+    // Close dropdown when opening edit dialog
+    setDropdownOpen(false);
   };
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -102,7 +105,7 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
         <DropdownMenuTrigger asChild>
           <button className="outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
             {avatarDisplay}
