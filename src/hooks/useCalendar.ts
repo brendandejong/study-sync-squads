@@ -162,6 +162,7 @@ export function useCalendar(studyGroups: StudyGroup[]) {
     currentDate,
     viewType,
     userEvents,
+    setUserEvents, // Export this for use by the chat component
     selectedDate,
     isEventDialogOpen,
     selectedEvent,
