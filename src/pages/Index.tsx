@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Course, StudyGroup, StudyTag } from '@/types';
 import Header from '@/components/Header';
@@ -7,6 +6,7 @@ import StudyGroupList from '@/components/study-groups/StudyGroupList';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupDetails from '@/components/GroupDetails';
 import CalendarView from '@/components/calendar/CalendarView';
+import ChatAssistant from '@/components/chat/ChatAssistant';
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar } from 'lucide-react';
 import { studyGroups as initialGroups, messages, currentUser } from '@/data/mockData';
@@ -28,17 +28,14 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const [isGroupDetailsOpen, setIsGroupDetailsOpen] = useState(false);
   const [studyGroups, setStudyGroups] = useState<StudyGroup[]>(initialGroups);
   
-  // Use showMyGroups state to control the view
   const [showMyGroups, setShowMyGroups] = useState<boolean>(myGroupsOnly);
   
   const location = useLocation();
   
-  // Effect to update the showMyGroups state when the route changes
   useEffect(() => {
     setShowMyGroups(location.pathname === '/my-groups');
   }, [location.pathname]);
   
-  // Get user's groups for filtering
   const userGroups = studyGroups.filter(
     g => g.members.some(m => m.id === currentUser.id)
   );
@@ -106,17 +103,14 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const userGroupsCount = userGroups.length;
 
   const filteredGroups = studyGroups.filter(group => {
-    // Course filter
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
     
-    // Tag filters
     if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
       return false;
     }
     
-    // My groups filter
     if (showMyGroups && !group.members.some(m => m.id === currentUser.id)) {
       return false;
     }
@@ -200,6 +194,8 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
         onJoinGroup={handleJoinGroup}
         onLeaveGroup={handleLeaveGroup}
       />
+      
+      <ChatAssistant />
     </div>
   );
 };
