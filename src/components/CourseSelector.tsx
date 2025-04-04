@@ -26,7 +26,7 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
   const [open, setOpen] = useState(false);
   
   // Ensure we have valid courses array
-  const validCourses = Array.isArray(courses) ? courses : [];
+  const validCourses = Array.isArray(courses) && courses.length > 0 ? courses : [];
 
   return (
     <div className="w-full md:w-80">
