@@ -22,6 +22,15 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
     course.code.toLowerCase().includes(searchTerm.toLowerCase())
   );
   
+  // Group courses by subject
+  const groupedCourses = filteredCourses.reduce((acc, course) => {
+    if (!acc[course.subject]) {
+      acc[course.subject] = [];
+    }
+    acc[course.subject].push(course);
+    return acc;
+  }, {} as Record<string, Course[]>);
+  
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -36,6 +45,25 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
     };
   }, []);
 
+  // Get subject display name with first letter capitalized
+  const getSubjectDisplayName = (subject: string) => {
+    return subject.charAt(0).toUpperCase() + subject.slice(1);
+  };
+
+  // Get color class for subject
+  const getSubjectColorClass = (subject: string) => {
+    const colorMap: Record<string, string> = {
+      math: 'bg-blue-500',
+      science: 'bg-green-500',
+      arts: 'bg-purple-500',
+      language: 'bg-yellow-500',
+      history: 'bg-red-500',
+      business: 'bg-orange-500',
+      tech: 'bg-indigo-500'
+    };
+    return colorMap[subject] || 'bg-gray-500';
+  };
+
   return (
     <div className="relative w-full" ref={dropdownRef}>
       <Button
@@ -45,7 +73,16 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
         className="w-full justify-between bg-white"
         onClick={() => setOpen(!open)}
       >
-        {selectedCourse ? selectedCourse.name : "Select course..."}
+        {selectedCourse ? (
+          <div className="flex items-center">
+            <span className={`h-3 w-3 rounded-full mr-2 ${getSubjectColorClass(selectedCourse.subject)}`} />
+            <span className="font-medium">{selectedCourse.code}</span>
+            <span className="mx-1 text-gray-500">-</span>
+            <span>{selectedCourse.name}</span>
+          </div>
+        ) : (
+          "Select course..."
+        )}
         <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
       </Button>
       
@@ -62,26 +99,34 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
           </div>
           
           <div className="max-h-[300px] overflow-y-auto">
-            {filteredCourses.length === 0 ? (
+            {Object.keys(groupedCourses).length === 0 ? (
               <div className="px-2 py-3 text-center text-sm text-gray-500">
                 No course found.
               </div>
             ) : (
               <div className="p-1">
-                {filteredCourses.map((course) => (
-                  <div
-                    key={course.id}
-                    className="flex items-center px-2 py-1.5 text-sm rounded-sm cursor-pointer hover:bg-gray-100"
-                    onClick={() => {
-                      onSelectCourse(course.id === selectedCourse?.id ? null : course);
-                      setOpen(false);
-                    }}
-                  >
-                    <span className={`h-3 w-3 rounded-full mr-2 inline-block subject-${course.subject}`} />
-                    <span className="flex-1">{course.name}</span>
-                    {selectedCourse?.id === course.id && (
-                      <Check className="ml-auto h-4 w-4" />
-                    )}
+                {Object.entries(groupedCourses).map(([subject, subjectCourses]) => (
+                  <div key={subject} className="mb-2">
+                    <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      {getSubjectDisplayName(subject)}
+                    </div>
+                    {subjectCourses.map((course) => (
+                      <div
+                        key={course.id}
+                        className="flex items-center px-2 py-1.5 text-sm rounded-sm cursor-pointer hover:bg-gray-100"
+                        onClick={() => {
+                          onSelectCourse(course.id === selectedCourse?.id ? null : course);
+                          setOpen(false);
+                        }}
+                      >
+                        <span className={`h-3 w-3 rounded-full mr-2 ${getSubjectColorClass(course.subject)}`} />
+                        <span className="font-medium mr-1">{course.code}</span>
+                        <span className="flex-1 text-gray-700">{course.name}</span>
+                        {selectedCourse?.id === course.id && (
+                          <Check className="ml-auto h-4 w-4" />
+                        )}
+                      </div>
+                    ))}
                   </div>
                 ))}
               </div>
