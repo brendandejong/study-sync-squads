@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Book, Calendar, Home, LogOut, User } from 'lucide-react';
+import { Book, Calendar, Home, LogOut, User, BarChart } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '@/context/AuthContext';
 import UserAvatar from './UserAvatar';
@@ -44,6 +44,10 @@ const Header = () => {
               <Link to="/calendar" className="text-gray-700 hover:text-indigo-500 flex items-center transition-colors duration-200">
                 <Calendar className="h-4 w-4 mr-1" />
                 <span>Calendar</span>
+              </Link>
+              <Link to="/insights" className="text-gray-700 hover:text-indigo-500 flex items-center transition-colors duration-200">
+                <BarChart className="h-4 w-4 mr-1" />
+                <span>Insights</span>
               </Link>
             </nav>
           </div>
@@ -117,6 +121,10 @@ const Header = () => {
               <Link to="/calendar" className="text-gray-700 hover:text-indigo-500 flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
                 <Calendar className="h-4 w-4 mr-2" />
                 <span>Calendar</span>
+              </Link>
+              <Link to="/insights" className="text-gray-700 hover:text-indigo-500 flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                <BarChart className="h-4 w-4 mr-2" />
+                <span>Insights</span>
               </Link>
               
               {isAuthenticated ? (
