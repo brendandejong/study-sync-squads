@@ -19,7 +19,7 @@ import {
   Clock, 
   BookOpen, 
   Calendar, 
-  Fire, 
+  Flame, 
   Plus 
 } from 'lucide-react';
 
@@ -165,7 +165,7 @@ const Statistics = () => {
               <Card className="card-gradient">
                 <CardHeader className="pb-2">
                   <CardTitle className="text-lg font-medium flex items-center">
-                    <Fire className="mr-2 h-5 w-5 text-orange-500" />
+                    <Flame className="mr-2 h-5 w-5 text-orange-500" />
                     Study Streak
                   </CardTitle>
                 </CardHeader>
