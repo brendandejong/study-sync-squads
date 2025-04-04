@@ -1,6 +1,7 @@
+
 import * as React from "react";
 import { format } from "date-fns";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Trash2 } from "lucide-react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,6 +51,9 @@ interface EventDialogProps {
   onClose: () => void;
   selectedDate: Date | null;
   onSave: (event: Omit<UserEvent, "id">) => void;
+  onDelete?: (eventId: string) => void;
+  event?: UserEvent | null;
+  mode?: "create" | "view" | "edit";
 }
 
 const EventDialog: React.FC<EventDialogProps> = ({
@@ -57,23 +61,52 @@ const EventDialog: React.FC<EventDialogProps> = ({
   onClose,
   selectedDate,
   onSave,
+  onDelete,
+  event,
+  mode = "create",
 }) => {
+  const isViewMode = mode === "view";
+  const isEditMode = mode === "edit";
+  const isCreateMode = mode === "create";
+  
+  const dialogTitle = isCreateMode 
+    ? "Add New Event" 
+    : isViewMode 
+      ? "Event Details" 
+      : "Edit Event";
+      
+  const dialogDescription = isCreateMode 
+    ? "Create a new event for your calendar." 
+    : isViewMode 
+      ? "View your event details." 
+      : "Edit your event details.";
+
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      title: "",
-      date: selectedDate || new Date(),
-      startTime: "09:00",
-      endTime: "10:00",
-      description: "",
+      title: event?.title || "",
+      date: event?.date || selectedDate || new Date(),
+      startTime: event?.startTime || "09:00",
+      endTime: event?.endTime || "10:00",
+      description: event?.description || "",
     },
   });
 
   React.useEffect(() => {
-    if (selectedDate) {
+    if (selectedDate && !event) {
       form.setValue("date", selectedDate);
     }
-  }, [selectedDate, form]);
+    
+    if (event) {
+      form.reset({
+        title: event.title,
+        date: event.date,
+        startTime: event.startTime,
+        endTime: event.endTime,
+        description: event.description || "",
+      });
+    }
+  }, [selectedDate, event, form]);
 
   const handleSubmit = (values: FormValues) => {
     onSave({
@@ -87,13 +120,20 @@ const EventDialog: React.FC<EventDialogProps> = ({
     onClose();
   };
 
+  const handleDelete = () => {
+    if (event?.id && onDelete) {
+      onDelete(event.id);
+      onClose();
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>Add New Event</DialogTitle>
+          <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogDescription>
-            Create a new event for your calendar.
+            {dialogDescription}
           </DialogDescription>
         </DialogHeader>
 
@@ -109,7 +149,12 @@ const EventDialog: React.FC<EventDialogProps> = ({
                 <FormItem>
                   <FormLabel>Event Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Study session" {...field} />
+                    <Input 
+                      placeholder="Study session" 
+                      {...field} 
+                      readOnly={isViewMode}
+                      className={isViewMode ? "bg-muted" : ""}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -123,13 +168,14 @@ const EventDialog: React.FC<EventDialogProps> = ({
                 <FormItem className="flex flex-col">
                   <FormLabel>Date</FormLabel>
                   <Popover>
-                    <PopoverTrigger asChild>
+                    <PopoverTrigger asChild disabled={isViewMode}>
                       <FormControl>
                         <Button
                           variant="outline"
                           className={cn(
                             "w-full pl-3 text-left font-normal",
-                            !field.value && "text-muted-foreground"
+                            !field.value && "text-muted-foreground",
+                            isViewMode && "bg-muted pointer-events-none"
                           )}
                         >
                           {field.value ? (
@@ -142,13 +188,15 @@ const EventDialog: React.FC<EventDialogProps> = ({
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        initialFocus
-                        className={cn("p-3 pointer-events-auto")}
-                      />
+                      {!isViewMode && (
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                          className={cn("p-3 pointer-events-auto")}
+                        />
+                      )}
                     </PopoverContent>
                   </Popover>
                   <FormMessage />
@@ -164,7 +212,12 @@ const EventDialog: React.FC<EventDialogProps> = ({
                   <FormItem>
                     <FormLabel>Start Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <Input 
+                        type="time" 
+                        {...field} 
+                        readOnly={isViewMode}
+                        className={isViewMode ? "bg-muted" : ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -178,7 +231,12 @@ const EventDialog: React.FC<EventDialogProps> = ({
                   <FormItem>
                     <FormLabel>End Time</FormLabel>
                     <FormControl>
-                      <Input type="time" {...field} />
+                      <Input 
+                        type="time" 
+                        {...field} 
+                        readOnly={isViewMode}
+                        className={isViewMode ? "bg-muted" : ""}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -195,7 +253,8 @@ const EventDialog: React.FC<EventDialogProps> = ({
                   <FormControl>
                     <Textarea
                       placeholder="Add notes about this event"
-                      className="resize-none"
+                      className={cn("resize-none", isViewMode && "bg-muted")}
+                      readOnly={isViewMode}
                       {...field}
                     />
                   </FormControl>
@@ -205,10 +264,27 @@ const EventDialog: React.FC<EventDialogProps> = ({
             />
 
             <DialogFooter>
+              {isViewMode && event?.id && onDelete && (
+                <Button 
+                  type="button" 
+                  variant="destructive" 
+                  onClick={handleDelete}
+                  className="mr-auto"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              )}
+              
               <Button type="button" variant="outline" onClick={onClose}>
-                Cancel
+                {isViewMode ? "Close" : "Cancel"}
               </Button>
-              <Button type="submit">Save Event</Button>
+              
+              {!isViewMode && (
+                <Button type="submit">
+                  {isCreateMode ? "Save Event" : "Update Event"}
+                </Button>
+              )}
             </DialogFooter>
           </form>
         </Form>
