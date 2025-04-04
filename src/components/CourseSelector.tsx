@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { Course } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -24,6 +24,9 @@ interface CourseSelectorProps {
 
 const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps) => {
   const [open, setOpen] = useState(false);
+  
+  // Ensure we have valid courses array
+  const validCourses = Array.isArray(courses) ? courses : [];
 
   return (
     <div className="w-full md:w-80">
@@ -43,27 +46,29 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
           <Command>
             <CommandInput placeholder="Search courses..." className="h-10" />
             <CommandEmpty>No course found.</CommandEmpty>
-            <CommandGroup>
-              {courses.map((course) => (
-                <CommandItem
-                  key={course.id}
-                  value={`${course.code} ${course.name}`}
-                  onSelect={() => {
-                    onSelectCourse(course);
-                    setOpen(false);
-                  }}
-                >
-                  <div className={`h-3 w-3 rounded-full mr-2 subject-${course.subject}`} />
-                  <span className="font-medium">{course.code}</span>
-                  <span className="ml-2 text-gray-600">{course.name}</span>
-                  <Check
-                    className={`ml-auto h-4 w-4 ${
-                      selectedCourse?.id === course.id ? "opacity-100" : "opacity-0"
-                    }`}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            {validCourses.length > 0 && (
+              <CommandGroup>
+                {validCourses.map((course) => (
+                  <CommandItem
+                    key={course.id}
+                    value={`${course.code} ${course.name}`}
+                    onSelect={() => {
+                      onSelectCourse(course);
+                      setOpen(false);
+                    }}
+                  >
+                    <div className={`h-3 w-3 rounded-full mr-2 subject-${course.subject}`} />
+                    <span className="font-medium">{course.code}</span>
+                    <span className="ml-2 text-gray-600">{course.name}</span>
+                    <Check
+                      className={`ml-auto h-4 w-4 ${
+                        selectedCourse?.id === course.id ? "opacity-100" : "opacity-0"
+                      }`}
+                    />
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
