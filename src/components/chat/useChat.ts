@@ -1,12 +1,10 @@
-
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
 import { fetchAIResponse, generateLocalResponse } from './chatService';
 
-// Embedded API key - Note: In production, you would normally use environment variables
-// This is a placeholder and should be replaced with your actual API key
-const EMBEDDED_API_KEY = "sk-your-openai-api-key-here";
+// Embedded API key - Using the provided key
+const EMBEDDED_API_KEY = "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";
 
 export const useChat = () => {
   const [isOpen, setIsOpen] = useState(false);
