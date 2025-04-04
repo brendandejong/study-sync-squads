@@ -1,10 +1,14 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Check, ChevronDown } from 'lucide-react';
-import { Course } from '@/types';
+import { Check, ChevronDown, Plus } from 'lucide-react';
+import { Course, Subject } from '@/types';
 import { Button } from '@/components/ui/button';
-import { courses } from '@/data/mockData';
+import { courses as defaultCourses } from '@/data/mockData';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from '@/components/ui/use-toast';
 
 interface CourseSelectorProps {
   selectedCourse: Course | null;
@@ -15,7 +19,21 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
   const [open, setOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [isAddCourseDialogOpen, setIsAddCourseDialogOpen] = useState(false);
   
+  // Get courses from localStorage or use default courses
+  const [courses, setCourses] = useState<Course[]>(() => {
+    const savedCourses = localStorage.getItem('userCourses');
+    return savedCourses ? [...JSON.parse(savedCourses), ...defaultCourses] : defaultCourses;
+  });
+  
+  // New course state
+  const [newCourse, setNewCourse] = useState({
+    name: '',
+    code: '',
+    subject: 'math' as Subject,
+  });
+
   // Filter courses based on search term
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -62,6 +80,44 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
       tech: 'bg-indigo-500'
     };
     return colorMap[subject] || 'bg-gray-500';
+  };
+
+  // Handle adding a new course
+  const handleAddCourse = () => {
+    if (!newCourse.name || !newCourse.code) {
+      toast({
+        title: "Error",
+        description: "Course name and code are required",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    const newCourseItem: Course = {
+      id: `custom-course-${Date.now()}`,
+      ...newCourse
+    };
+    
+    const updatedCourses = [newCourseItem, ...courses];
+    setCourses(updatedCourses);
+    
+    // Save to localStorage
+    const userCourses = updatedCourses.filter(course => course.id.startsWith('custom-course-'));
+    localStorage.setItem('userCourses', JSON.stringify(userCourses));
+    
+    // Reset form
+    setNewCourse({
+      name: '',
+      code: '',
+      subject: 'math' as Subject,
+    });
+    
+    setIsAddCourseDialogOpen(false);
+    
+    toast({
+      title: "Course added",
+      description: `${newCourseItem.code} - ${newCourseItem.name} has been added to your courses.`
+    });
   };
 
   return (
@@ -131,9 +187,83 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
                 ))}
               </div>
             )}
+            
+            <div className="border-t border-gray-200 p-2">
+              <Button 
+                variant="ghost" 
+                className="w-full flex items-center justify-center text-blue-600 hover:bg-blue-50"
+                onClick={() => {
+                  setOpen(false);
+                  setIsAddCourseDialogOpen(true);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Custom Course
+              </Button>
+            </div>
           </div>
         </div>
       )}
+      
+      <Dialog open={isAddCourseDialogOpen} onOpenChange={setIsAddCourseDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Custom Course</DialogTitle>
+          </DialogHeader>
+          
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="courseCode">Course Code</Label>
+              <Input
+                id="courseCode"
+                placeholder="e.g., CS 101"
+                value={newCourse.code}
+                onChange={(e) => setNewCourse({ ...newCourse, code: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="courseName">Course Name</Label>
+              <Input
+                id="courseName"
+                placeholder="e.g., Introduction to Computer Science"
+                value={newCourse.name}
+                onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="courseSubject">Subject</Label>
+              <Select 
+                value={newCourse.subject} 
+                onValueChange={(value: Subject) => setNewCourse({ ...newCourse, subject: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a subject" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="math">Math</SelectItem>
+                  <SelectItem value="science">Science</SelectItem>
+                  <SelectItem value="arts">Arts</SelectItem>
+                  <SelectItem value="language">Language</SelectItem>
+                  <SelectItem value="history">History</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                  <SelectItem value="tech">Technology</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddCourseDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddCourse}>
+              Add Course
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
