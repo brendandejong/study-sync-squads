@@ -3,7 +3,6 @@ import { Course, StudyTag } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CourseSelector from '@/components/CourseSelector';
-import { courses } from '@/data/mockData';
 
 interface FilterPanelProps {
   selectedCourse: Course | null;
