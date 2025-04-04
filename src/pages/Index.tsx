@@ -10,8 +10,13 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { studyGroups as initialGroups, messages, currentUser } from '@/data/mockData';
 import { useToast } from '@/components/ui/use-toast';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
-const Index = () => {
+interface IndexProps {
+  myGroupsOnly?: boolean;
+}
+
+const Index = ({ myGroupsOnly = false }: IndexProps) => {
   const { toast } = useToast();
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>([]);
@@ -19,6 +24,8 @@ const Index = () => {
   const [selectedGroup, setSelectedGroup] = useState<StudyGroup | null>(null);
   const [isGroupDetailsOpen, setIsGroupDetailsOpen] = useState(false);
   const [studyGroups, setStudyGroups] = useState<StudyGroup[]>(initialGroups);
+  
+  const [showMyGroups, setShowMyGroups] = useState<boolean>(myGroupsOnly);
   
   const handleGroupClick = (groupId: string) => {
     const group = studyGroups.find(g => g.id === groupId);
@@ -84,6 +91,25 @@ const Index = () => {
     g => g.members.some(m => m.id === currentUser.id)
   ).length;
 
+  const filteredGroups = studyGroups.filter(group => {
+    // Course filter
+    if (selectedCourse && group.course.id !== selectedCourse.id) {
+      return false;
+    }
+    
+    // Tag filters
+    if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
+      return false;
+    }
+    
+    // My groups filter
+    if (showMyGroups && !group.members.some(m => m.id === currentUser.id)) {
+      return false;
+    }
+    
+    return true;
+  });
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -97,6 +123,19 @@ const Index = () => {
           </Button>
         </div>
         
+        <div className="mb-6">
+          <Tabs 
+            defaultValue={showMyGroups ? "my-groups" : "all-groups"} 
+            onValueChange={(value) => setShowMyGroups(value === "my-groups")}
+            className="w-full"
+          >
+            <TabsList className="w-full sm:w-auto">
+              <TabsTrigger value="all-groups" className="flex-1 sm:flex-none">All Groups ({studyGroups.length})</TabsTrigger>
+              <TabsTrigger value="my-groups" className="flex-1 sm:flex-none">My Groups ({userGroupsCount})</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-[1fr_3fr] gap-6">
           <FilterPanel 
             selectedCourse={selectedCourse}
@@ -108,7 +147,7 @@ const Index = () => {
           />
           
           <StudyGroupList 
-            studyGroups={studyGroups}
+            studyGroups={filteredGroups}
             onGroupClick={handleGroupClick}
             onCreateClick={() => setIsCreateModalOpen(true)}
             selectedCourse={selectedCourse?.id || null}

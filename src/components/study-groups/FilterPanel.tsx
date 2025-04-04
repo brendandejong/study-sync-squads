@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import CourseSelector from '@/components/CourseSelector';
 import { courses } from '@/data/mockData';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface FilterPanelProps {
   selectedCourse: Course | null;
@@ -41,12 +42,12 @@ const FilterPanel = ({
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <h2 className="font-semibold mb-4">Filters</h2>
+      <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+        <h2 className="font-semibold text-lg mb-4">Filters</h2>
         
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Course
             </label>
             <CourseSelector
@@ -56,15 +57,15 @@ const FilterPanel = ({
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Group Type
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Study Type
             </label>
             <div className="flex flex-wrap gap-2">
               {availableTags.map((tag) => (
                 <Badge
                   key={tag.value}
                   variant={activeFilters.includes(tag.value) ? "default" : "outline"}
-                  className={`cursor-pointer ${
+                  className={`cursor-pointer text-sm py-1 px-3 ${
                     activeFilters.includes(tag.value) ? "" : "hover:bg-gray-100"
                   }`}
                   onClick={() => toggleFilter(tag.value)}
@@ -77,8 +78,8 @@ const FilterPanel = ({
           
           {(selectedCourse || activeFilters.length > 0) && (
             <Button
-              variant="ghost"
-              className="w-full text-sm"
+              variant="outline"
+              className="w-full text-sm mt-2"
               onClick={() => {
                 setSelectedCourse(null);
                 setActiveFilters([]);
@@ -90,20 +91,20 @@ const FilterPanel = ({
         </div>
       </div>
       
-      <div className="bg-white p-4 rounded-lg border border-gray-200">
-        <h2 className="font-semibold mb-4">Quick Stats</h2>
-        <div className="space-y-2">
-          <div className="flex justify-between">
+      <div className="bg-white p-5 rounded-lg border border-gray-200 shadow-sm">
+        <h2 className="font-semibold text-lg mb-4">Overview</h2>
+        <div className="space-y-3">
+          <div className="flex justify-between items-center">
             <span className="text-gray-600">Total Groups</span>
-            <span className="font-medium">{studyGroupsCount}</span>
+            <span className="font-medium text-lg">{studyGroupsCount}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <span className="text-gray-600">Your Groups</span>
-            <span className="font-medium">{userGroupsCount}</span>
+            <span className="font-medium text-lg">{userGroupsCount}</span>
           </div>
-          <div className="flex justify-between">
+          <div className="flex justify-between items-center">
             <span className="text-gray-600">Available Courses</span>
-            <span className="font-medium">{courses.length}</span>
+            <span className="font-medium text-lg">{courses.length}</span>
           </div>
         </div>
       </div>
