@@ -1,3 +1,4 @@
+
 export interface User {
   id: string;
   name: string;
@@ -13,6 +14,8 @@ export interface Course {
   code: string;
   name: string;
   subject: Subject;
+  professor?: string;
+  school?: string;
 }
 
 export type Subject = 'math' | 'science' | 'arts' | 'language' | 'history' | 'business' | 'tech';

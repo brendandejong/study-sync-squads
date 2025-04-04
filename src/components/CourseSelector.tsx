@@ -21,10 +21,10 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isAddCourseDialogOpen, setIsAddCourseDialogOpen] = useState(false);
   
-  // Get courses from localStorage or use default courses
+  // Get courses from localStorage only, since we no longer have default courses
   const [courses, setCourses] = useState<Course[]>(() => {
     const savedCourses = localStorage.getItem('userCourses');
-    return savedCourses ? [...JSON.parse(savedCourses), ...defaultCourses] : defaultCourses;
+    return savedCourses ? JSON.parse(savedCourses) : [];
   });
   
   // New course state
@@ -32,12 +32,16 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
     name: '',
     code: '',
     subject: 'math' as Subject,
+    professor: '',
+    school: ''
   });
 
   // Filter courses based on search term
   const filteredCourses = courses.filter(course => 
     course.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    course.code.toLowerCase().includes(searchTerm.toLowerCase())
+    course.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (course.professor && course.professor.toLowerCase().includes(searchTerm.toLowerCase())) ||
+    (course.school && course.school.toLowerCase().includes(searchTerm.toLowerCase()))
   );
   
   // Group courses by subject
@@ -102,14 +106,15 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
     setCourses(updatedCourses);
     
     // Save to localStorage
-    const userCourses = updatedCourses.filter(course => course.id.startsWith('custom-course-'));
-    localStorage.setItem('userCourses', JSON.stringify(userCourses));
+    localStorage.setItem('userCourses', JSON.stringify(updatedCourses));
     
     // Reset form
     setNewCourse({
       name: '',
       code: '',
       subject: 'math' as Subject,
+      professor: '',
+      school: ''
     });
     
     setIsAddCourseDialogOpen(false);
@@ -176,8 +181,19 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
                         }}
                       >
                         <span className={`h-3 w-3 rounded-full mr-2 ${getSubjectColorClass(course.subject)}`} />
-                        <span className="font-medium mr-1">{course.code}</span>
-                        <span className="flex-1 text-gray-700">{course.name}</span>
+                        <div className="flex-1">
+                          <div className="flex items-center">
+                            <span className="font-medium mr-1">{course.code}</span>
+                            <span className="text-gray-700">{course.name}</span>
+                          </div>
+                          {(course.professor || course.school) && (
+                            <div className="text-xs text-gray-500">
+                              {course.professor && <span>{course.professor}</span>}
+                              {course.professor && course.school && <span> • </span>}
+                              {course.school && <span>{course.school}</span>}
+                            </div>
+                          )}
+                        </div>
                         {selectedCourse?.id === course.id && (
                           <Check className="ml-auto h-4 w-4" />
                         )}
@@ -229,6 +245,26 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
                 placeholder="e.g., Introduction to Computer Science"
                 value={newCourse.name}
                 onChange={(e) => setNewCourse({ ...newCourse, name: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="courseProfessor">Professor</Label>
+              <Input
+                id="courseProfessor"
+                placeholder="e.g., Dr. John Smith"
+                value={newCourse.professor}
+                onChange={(e) => setNewCourse({ ...newCourse, professor: e.target.value })}
+              />
+            </div>
+            
+            <div className="grid grid-cols-1 gap-2">
+              <Label htmlFor="courseSchool">School</Label>
+              <Input
+                id="courseSchool"
+                placeholder="e.g., Stanford University"
+                value={newCourse.school}
+                onChange={(e) => setNewCourse({ ...newCourse, school: e.target.value })}
               />
             </div>
             
