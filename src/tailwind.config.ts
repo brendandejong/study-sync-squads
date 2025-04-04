@@ -97,6 +97,19 @@ export default {
           900: '#78350f',
           950: '#451a03',
         },
+        // Pastel palette
+        pastel: {
+          blue: '#D3E4FD',
+          green: '#F2FCE2',
+          yellow: '#FEF7CD',
+          orange: '#FEC6A1',
+          purple: '#E5DEFF',
+          pink: '#FFDEE2',
+          peach: '#FDE1D3',
+          gray: '#F1F0FB',
+          mint: '#DCFCE7',
+          lavender: '#F3E8FF',
+        }
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -104,8 +117,12 @@ export default {
         sm: 'calc(var(--radius) - 4px)'
       },
       boxShadow: {
-        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05)',
-        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05)',
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03)',
+        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.03)',
+      },
+      backgroundImage: {
+        'flower-pattern': "url('/src/assets/flower-pattern.svg')",
+        'dots-pattern': "radial-gradient(rgba(180, 200, 230, 0.2) 1px, transparent 1px)",
       },
       keyframes: {
         "accordion-down": {
@@ -116,10 +133,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "float": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float 6s ease-in-out infinite",
       },
     },
   },

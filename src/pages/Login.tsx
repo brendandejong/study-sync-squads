@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -51,10 +52,14 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-indigo-100 p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-blue-50 to-indigo-100 p-4 decorative-dots">
+      <div className="absolute top-10 left-10 text-4xl animate-float opacity-20">🌸</div>
+      <div className="absolute bottom-10 right-10 text-4xl animate-float opacity-20" style={{ animationDelay: "2s" }}>🌿</div>
+      
+      <Card className="w-full max-w-md border border-indigo-100 shadow-lg">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-300 via-purple-300 to-pink-300"></div>
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-indigo-500 to-purple-500">Welcome Back</CardTitle>
           <CardDescription className="text-center">
             Enter your credentials to sign in to your account
           </CardDescription>
@@ -62,7 +67,7 @@ const Login = () => {
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-indigo-700">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -71,12 +76,13 @@ const Login = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={isLoading}
+                className="border-indigo-100 focus:border-indigo-300"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password">Password</Label>
-                <Link to="/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">
+                <Label htmlFor="password" className="text-indigo-700">Password</Label>
+                <Link to="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-800">
                   Forgot password?
                 </Link>
               </div>
@@ -89,12 +95,13 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
+                  className="border-indigo-100 focus:border-indigo-300"
                 />
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="absolute right-2 top-1/2 -translate-y-1/2"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-indigo-400 hover:text-indigo-600"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -105,7 +112,7 @@ const Login = () => {
           <CardFooter className="flex flex-col space-y-4">
             <Button 
               type="submit" 
-              className="w-full" 
+              className="w-full bg-indigo-500 hover:bg-indigo-600" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -122,7 +129,7 @@ const Login = () => {
             </Button>
             <p className="text-center text-sm">
               Don't have an account?{" "}
-              <Link to="/signup" className="text-blue-600 hover:text-blue-800 font-medium">
+              <Link to="/signup" className="text-indigo-600 hover:text-indigo-800 font-medium">
                 Sign up
               </Link>
             </p>

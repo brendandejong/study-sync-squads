@@ -15,14 +15,14 @@ const StudyGroupCard = ({ group, onClick }: StudyGroupCardProps) => {
   
   return (
     <div 
-      className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+      className="bg-white rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow card-gradient relative"
       onClick={() => onClick(id)}
     >
       <div className={`h-2 subject-${course.subject}`} />
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
           <h3 className="font-semibold text-lg">{name}</h3>
-          <span className="text-xs font-medium bg-gray-100 px-2 py-1 rounded-full">
+          <span className="text-xs font-medium bg-pastel-blue px-2 py-1 rounded-full">
             {course.code}
           </span>
         </div>
@@ -41,7 +41,7 @@ const StudyGroupCard = ({ group, onClick }: StudyGroupCardProps) => {
         </div>
         
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
-          <Calendar className="h-4 w-4" />
+          <Calendar className="h-4 w-4 text-indigo-400" />
           <div>
             {timeSlots.map((slot, index) => (
               <div key={index}>
@@ -58,21 +58,26 @@ const StudyGroupCard = ({ group, onClick }: StudyGroupCardProps) => {
                 <UserAvatar key={member.id} user={member} size="sm" />
               ))}
               {members.length > 3 && (
-                <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center text-xs text-gray-600">
+                <div className="h-8 w-8 rounded-full bg-pastel-lavender flex items-center justify-center text-xs text-indigo-600">
                   +{members.length - 3}
                 </div>
               )}
             </div>
             <span className="text-sm text-gray-600 flex items-center">
-              <Users className="h-4 w-4 mr-1" />
+              <Users className="h-4 w-4 mr-1 text-indigo-400" />
               {members.length}/{maxMembers}
             </span>
           </div>
           
-          <Button variant="ghost" size="sm" onClick={(e) => {
-            e.stopPropagation();
-            onClick(id);
-          }}>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-indigo-500 hover:text-indigo-600 hover:bg-indigo-50"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick(id);
+            }}
+          >
             Details
           </Button>
         </div>
