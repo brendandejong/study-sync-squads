@@ -1,101 +1,166 @@
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import UserAvatar from '@/components/UserAvatar';
-import { currentUser } from '@/data/mockData';
-import { Search, Bell, Menu, X } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { Book, Calendar, Home, LogOut, User } from 'lucide-react';
+import { Button } from './ui/button';
+import { useAuth } from '@/context/AuthContext';
+import UserAvatar from './UserAvatar';
 
 const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { currentUser, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
   
-  const isActive = (path: string) => location.pathname === path;
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+  
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-      <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center">
-          <Link to="/" className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent mr-6">
-            StudySync
-          </Link>
-          
-          <nav className="hidden md:flex space-x-6">
-            <Link 
-              to="/" 
-              className={`font-medium transition-colors ${isActive('/') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
-            >
-              Dashboard
+    <header className="bg-white shadow-sm">
+      <div className="container mx-auto px-4 py-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-6">
+            <Link to="/" className="flex items-center">
+              <Book className="h-8 w-8 text-indigo-600" />
+              <span className="ml-2 text-xl font-bold text-gray-900">StudySync</span>
             </Link>
-            <Link 
-              to="/my-groups" 
-              className={`font-medium transition-colors ${isActive('/my-groups') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
-            >
-              My Groups
-            </Link>
-            <Link 
-              to="/calendar" 
-              className={`font-medium transition-colors ${isActive('/calendar') ? 'text-primary' : 'text-gray-700 hover:text-primary'}`}
-            >
-              Calendar
-            </Link>
-          </nav>
-        </div>
-        
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Search className="h-5 w-5 text-gray-500" />
-          </Button>
-          <Button variant="ghost" size="icon" className="hidden sm:flex">
-            <Bell className="h-5 w-5 text-gray-500" />
-          </Button>
-          
-          <div className="flex items-center">
-            <UserAvatar user={currentUser} size="sm" showDropdown={true} />
+            
+            <nav className="hidden md:flex space-x-6">
+              <Link to="/" className="text-gray-700 hover:text-indigo-600 flex items-center">
+                <Home className="h-4 w-4 mr-1" />
+                <span>Study Groups</span>
+              </Link>
+              <Link to="/my-groups" className="text-gray-700 hover:text-indigo-600 flex items-center">
+                <User className="h-4 w-4 mr-1" />
+                <span>My Groups</span>
+              </Link>
+              <Link to="/calendar" className="text-gray-700 hover:text-indigo-600 flex items-center">
+                <Calendar className="h-4 w-4 mr-1" />
+                <span>Calendar</span>
+              </Link>
+            </nav>
           </div>
-          
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+
+          <div className="flex items-center space-x-4">
+            {isAuthenticated ? (
+              <>
+                <div className="hidden md:block">
+                  <UserAvatar 
+                    user={currentUser || { id: '', name: 'Guest', email: '' }} 
+                    showDropdown={true}
+                  />
+                </div>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="hidden md:flex"
+                >
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <div className="hidden md:flex space-x-2">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => navigate('/login')}
+                >
+                  Login
+                </Button>
+                <Button 
+                  size="sm" 
+                  onClick={() => navigate('/signup')}
+                >
+                  Sign up
+                </Button>
+              </div>
+            )}
+            
+            <button
+              className="md:hidden rounded-md p-2 text-gray-700 hover:bg-gray-100"
+              onClick={toggleMobileMenu}
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden mt-3 border-t pt-3">
+            <nav className="flex flex-col space-y-3">
+              <Link to="/" className="text-gray-700 hover:text-indigo-600 flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                <Home className="h-4 w-4 mr-2" />
+                <span>Study Groups</span>
+              </Link>
+              <Link to="/my-groups" className="text-gray-700 hover:text-indigo-600 flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                <User className="h-4 w-4 mr-2" />
+                <span>My Groups</span>
+              </Link>
+              <Link to="/calendar" className="text-gray-700 hover:text-indigo-600 flex items-center" onClick={() => setIsMobileMenuOpen(false)}>
+                <Calendar className="h-4 w-4 mr-2" />
+                <span>Calendar</span>
+              </Link>
+              
+              {isAuthenticated ? (
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <div className="flex items-center">
+                    <UserAvatar 
+                      user={currentUser || { id: '', name: 'Guest', email: '' }}
+                      size="sm"
+                      showDropdown={false}
+                    />
+                    <span className="ml-2 text-gray-700">{currentUser?.name}</span>
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={handleLogout}
+                  >
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex space-x-2 pt-2 border-t">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      navigate('/login');
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    onClick={() => {
+                      navigate('/signup');
+                      setIsMobileMenuOpen(false);
+                    }}
+                  >
+                    Sign up
+                  </Button>
+                </div>
+              )}
+            </nav>
+          </div>
+        )}
       </div>
-      
-      {/* Mobile menu */}
-      {isMenuOpen && (
-        <div className="md:hidden bg-white border-b border-gray-200">
-          <nav className="container mx-auto px-4 py-3 flex flex-col space-y-4">
-            <Link 
-              to="/" 
-              className={`font-medium ${isActive('/') ? 'text-primary' : 'text-gray-700'}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Dashboard
-            </Link>
-            <Link 
-              to="/my-groups" 
-              className={`font-medium ${isActive('/my-groups') ? 'text-primary' : 'text-gray-700'}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              My Groups
-            </Link>
-            <Link 
-              to="/calendar" 
-              className={`font-medium ${isActive('/calendar') ? 'text-primary' : 'text-gray-700'}`}
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Calendar
-            </Link>
-            <div className="flex items-center">
-              <Button variant="ghost" size="icon">
-                <Search className="h-5 w-5 text-gray-500" />
-              </Button>
-              <Button variant="ghost" size="icon">
-                <Bell className="h-5 w-5 text-gray-500" />
-              </Button>
-            </div>
-          </nav>
-        </div>
-      )}
     </header>
   );
 };
