@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import Header from '@/components/Header';
 import { useStats, StudyGoal } from '@/hooks/useStats';
@@ -22,17 +21,30 @@ import {
   Calendar, 
   Flame, 
   Plus,
-  Edit 
+  Edit,
+  Trash
 } from 'lucide-react';
+import { 
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const Insights = () => {
   const { toast } = useToast();
-  const { goals, stats, addGoal, updateStats, logStudySession } = useStats();
+  const { goals, stats, addGoal, updateStats, logStudySession, deleteGoal } = useStats();
   const { courses } = useCourses();
 
   const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
   const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
   const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [goalToDelete, setGoalToDelete] = useState<string | null>(null);
   
   const [newGoal, setNewGoal] = useState<Partial<StudyGoal>>({
     title: '',
@@ -55,13 +67,11 @@ const Insights = () => {
     preferredStudyType: stats.preferredStudyType
   });
 
-  // Find course names for stats
   const getMostStudiedCourseName = () => {
     const course = courses.find(c => c.id === stats.mostStudiedCourse);
     return course ? `${course.code}: ${course.name}` : "None selected";
   };
 
-  // Prepare data for pie chart - make this editable
   const [studyTypeData, setStudyTypeData] = useState([
     { name: 'Quiet', value: 40, color: '#93c5fd' },
     { name: 'Discussion', value: 25, color: '#c4b5fd' },
@@ -70,7 +80,6 @@ const Insights = () => {
     { name: 'Exam Prep', value: 10, color: '#fda4af' }
   ]);
 
-  // Prepare data for bar chart - make this editable
   const [weeklyProgressData, setWeeklyProgressData] = useState([
     { name: 'Mon', hours: 0 },
     { name: 'Tue', hours: 0 },
@@ -120,7 +129,7 @@ const Insights = () => {
       date: studySession.date,
       duration: studySession.duration,
       courseId: studySession.courseId,
-      tags: [studySession.tags[0]] // Simplify for now
+      tags: [studySession.tags[0]]
     });
     
     setIsSessionDialogOpen(false);
@@ -149,6 +158,24 @@ const Insights = () => {
       title: "Stats updated",
       description: "Your insights have been updated successfully"
     });
+  };
+  
+  const confirmDeleteGoal = (goalId: string) => {
+    setGoalToDelete(goalId);
+    setIsDeleteDialogOpen(true);
+  };
+  
+  const handleDeleteGoal = () => {
+    if (goalToDelete) {
+      deleteGoal(goalToDelete);
+      setIsDeleteDialogOpen(false);
+      setGoalToDelete(null);
+      
+      toast({
+        title: "Goal deleted",
+        description: "Your study goal has been removed successfully"
+      });
+    }
   };
   
   const updateChartData = (chartData, index, newValue) => {
@@ -187,7 +214,6 @@ const Insights = () => {
           </TabsList>
           
           <TabsContent value="overview" className="space-y-6">
-            {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="card-gradient">
                 <CardHeader className="pb-2">
@@ -269,7 +295,6 @@ const Insights = () => {
               </Card>
             </div>
             
-            {/* Charts */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="card-gradient">
                 <CardHeader>
@@ -279,7 +304,6 @@ const Insights = () => {
                       Weekly Progress
                     </CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => {
-                      // Show a dialog to edit weekly progress data
                       toast({
                         title: "Edit Weekly Data",
                         description: "Use the 'Log Session' button to record study time which will update this chart"
@@ -316,7 +340,6 @@ const Insights = () => {
                       Study Method Distribution
                     </CardTitle>
                     <Button variant="ghost" size="icon" onClick={() => {
-                      // Show a dialog to edit study method distribution
                       toast({
                         title: "Edit Study Methods",
                         description: "Use the 'Log Session' button to record your study methods which will update this chart"
@@ -359,7 +382,17 @@ const Insights = () => {
                 goals.map((goal) => (
                   <Card key={goal.id} className="card-gradient">
                     <CardHeader className="pb-2">
-                      <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
+                      <div className="flex justify-between items-center">
+                        <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => confirmDeleteGoal(goal.id)}
+                          className="text-red-500 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
+                      </div>
                       <CardDescription>
                         Target: {goal.targetHours} hours • Due: {new Date(goal.deadline).toLocaleDateString()}
                       </CardDescription>
@@ -387,7 +420,6 @@ const Insights = () => {
           </TabsContent>
         </Tabs>
         
-        {/* Add Goal Dialog */}
         <Dialog open={isGoalDialogOpen} onOpenChange={setIsGoalDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -431,7 +463,6 @@ const Insights = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Add Session Dialog */}
         <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -496,7 +527,6 @@ const Insights = () => {
           </DialogContent>
         </Dialog>
         
-        {/* Edit Stats Dialog */}
         <Dialog open={isStatsDialogOpen} onOpenChange={setIsStatsDialogOpen}>
           <DialogContent>
             <DialogHeader>
@@ -557,6 +587,26 @@ const Insights = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        
+        <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Delete Study Goal</AlertDialogTitle>
+              <AlertDialogDescription>
+                Are you sure you want to delete this goal? This action cannot be undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDeleteGoal}
+                className="bg-red-500 text-white hover:bg-red-600"
+              >
+                Delete
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </main>
     </div>
   );
