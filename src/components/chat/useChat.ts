@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/ui/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
@@ -40,29 +41,28 @@ export const useChat = () => {
       let response: string;
       let usingLocalFallback = false;
       
-      // Only try to use the API if we haven't already determined it's not working
-      if (!isUsingLocalResponses) {
-        try {
-          response = await fetchAIResponse(input, EMBEDDED_API_KEY);
-        } catch (error) {
-          console.error('Error with Gemini API:', error);
-          // Set flag to use local responses for future messages
-          setIsUsingLocalResponses(true);
-          usingLocalFallback = true;
-          // Fallback to local response generation
-          response = generateLocalResponse(input);
-          
-          // Show a notification about falling back to local responses
-          toast({
-            title: "Using offline mode",
-            description: "Unable to connect to Gemini AI service. Using enhanced local responses instead.",
-            variant: "default"
-          });
-        }
-      } else {
-        // We already know we need to use local responses
+      // Reset the local responses flag when trying a new message
+      if (isUsingLocalResponses) {
+        setIsUsingLocalResponses(false);
+      }
+      
+      // Try to use the API if we haven't already determined it's not working
+      try {
+        response = await fetchAIResponse(input, EMBEDDED_API_KEY);
+      } catch (error) {
+        console.error('Error with Gemini API:', error);
+        // Set flag to use local responses for future messages
+        setIsUsingLocalResponses(true);
         usingLocalFallback = true;
+        // Fallback to local response generation
         response = generateLocalResponse(input);
+        
+        // Show a notification about falling back to local responses
+        toast({
+          title: "Using offline mode",
+          description: "Unable to connect to Gemini AI service. Using enhanced local responses instead.",
+          variant: "default"
+        });
       }
       
       // Update the loading message with the actual response
