@@ -5,6 +5,7 @@ export interface ChatMessage {
   sender: 'user' | 'assistant';
   timestamp: Date;
   isLoading?: boolean;
+  isLocalResponse?: boolean;
 }
 
 export const INITIAL_MESSAGES: ChatMessage[] = [

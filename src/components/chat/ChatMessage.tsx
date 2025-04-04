@@ -1,7 +1,7 @@
 
 import { cn } from '@/lib/utils';
 import UserAvatar from '@/components/UserAvatar';
-import { Bot } from 'lucide-react';
+import { Bot, Wifi, WifiOff } from 'lucide-react';
 import { ChatMessage as ChatMessageType } from './types';
 import { User } from '@/types';
 
@@ -39,7 +39,15 @@ const ChatMessage = ({ message, currentUser }: ChatMessageProps) => {
             <span className="animate-bounce" style={{ animationDelay: "0.4s" }}>•</span>
           </div>
         ) : (
-          <p className="text-sm">{message.content}</p>
+          <>
+            <p className="text-sm whitespace-pre-line">{message.content}</p>
+            {message.isLocalResponse && (
+              <div className="flex items-center gap-1 mt-1 text-xs text-amber-600">
+                <WifiOff className="h-3 w-3" />
+                <span>Offline response</span>
+              </div>
+            )}
+          </>
         )}
         <span className="text-xs opacity-70 mt-1 block">
           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

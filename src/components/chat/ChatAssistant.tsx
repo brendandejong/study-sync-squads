@@ -14,6 +14,7 @@ const ChatAssistant = () => {
     setIsOpen, 
     messages, 
     isLoading, 
+    isUsingLocalResponses,
     handleSendMessage
   } = useChat();
   
@@ -41,6 +42,7 @@ const ChatAssistant = () => {
           {/* Chat header */}
           <ChatHeader 
             onClose={() => setIsOpen(false)}
+            isUsingLocalResponses={isUsingLocalResponses}
           />
           
           {/* Chat messages */}
