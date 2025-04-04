@@ -3,8 +3,8 @@ import { GeminiAPIResponse } from './types';
 
 // Function to fetch a response from Gemini API
 export const fetchAIResponse = async (userInput: string, apiKey: string): Promise<string> => {
-  // Updated URL to use the correct Gemini API endpoint (v1 instead of v1beta)
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.0-pro:generateContent?key=${apiKey}`;
+  // Updated URL to use the correct Gemini model name (gemini-pro instead of gemini-1.0-pro)
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
   
   const response = await fetch(url, {
     method: 'POST',
