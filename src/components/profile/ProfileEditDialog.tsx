@@ -28,12 +28,14 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   const [editedUser, setEditedUser] = useState<User>({ ...user });
   const { toast } = useToast();
   const { updateUserProfile } = useAuth();
-  const bgColor = getRandomColor(user.id || '0');
   
-  // Update local state when user prop changes
+  // Update local state when user prop changes or dialog opens
   useEffect(() => {
-    setEditedUser({ ...user });
-  }, [user, isOpen]); // Also update when dialog opens
+    if (isOpen && user) {
+      setEditedUser({ ...user });
+      console.log("ProfileEditDialog received user:", user);
+    }
+  }, [user, isOpen]);
   
   const handleSave = () => {
     // Validate that the name is not empty
@@ -50,7 +52,11 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
     const updatedUser = {
       ...editedUser,
       name: editedUser.name.trim(),
+      email: editedUser.email || user.email, // Ensure email is never empty
+      id: user.id, // Preserve the original user ID
     };
+    
+    console.log("ProfileEditDialog saving user:", updatedUser);
     
     // Update user in auth context (and localStorage)
     updateUserProfile(updatedUser);
@@ -96,7 +102,7 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
             <div className="relative">
               <Avatar className="h-16 w-16 text-lg">
                 <AvatarImage src={editedUser.avatar} alt={editedUser.name} />
-                <AvatarFallback className={bgColor}>{getInitials(editedUser.name)}</AvatarFallback>
+                <AvatarFallback className={getRandomColor(editedUser.id || '0')}>{getInitials(editedUser.name)}</AvatarFallback>
               </Avatar>
               <label 
                 htmlFor="avatar-upload" 

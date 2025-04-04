@@ -15,10 +15,10 @@ const Account = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
-  const [name, setName] = useState(currentUser?.name || "");
-  const [email, setEmail] = useState(currentUser?.email || "");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
 
-  // Update local state when currentUser changes
+  // Update local state whenever currentUser changes
   useEffect(() => {
     if (currentUser) {
       setName(currentUser.name);
@@ -41,8 +41,10 @@ const Account = () => {
       const updatedUser = {
         ...currentUser,
         name: name.trim(),
-        email
+        email: email.trim() || currentUser.email,
       };
+      
+      console.log("Account page saving user:", updatedUser);
       
       // Update user profile in AuthContext (and localStorage)
       updateUserProfile(updatedUser);

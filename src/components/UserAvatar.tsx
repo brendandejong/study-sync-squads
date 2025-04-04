@@ -1,6 +1,6 @@
 
 import { User } from '@/types';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import AvatarDisplay from './profile/AvatarDisplay';
 import AvatarDropdownMenu from './profile/AvatarDropdownMenu';
 import ProfileEditDialog from './profile/ProfileEditDialog';
@@ -12,16 +12,17 @@ interface UserAvatarProps {
   showDropdown?: boolean;
 }
 
-const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps) => {
+const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: UserAvatarProps) => {
   const [isEditing, setIsEditing] = useState(false);
   const { currentUser, updateUserProfile } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   
-  // Always use the currentUser from context, which is the source of truth
-  const activeUser = currentUser || user;
+  // Always use the most up-to-date user from context
+  const activeUser = currentUser || initialUser;
   
   // If no user is available, don't render anything
   if (!activeUser || !activeUser.name) {
+    console.log("UserAvatar: No valid user available");
     return null;
   }
   
@@ -32,6 +33,8 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   };
 
   const handleSaveProfile = (updatedUser: User) => {
+    console.log("UserAvatar saving profile:", updatedUser);
+    
     // Update the user in context and localStorage
     updateUserProfile(updatedUser);
     setIsEditing(false);

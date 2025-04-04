@@ -41,25 +41,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const updateUserProfile = (updatedUser: User) => {
     console.log('Updating user profile:', updatedUser);
     
-    // Make sure to create a new object to ensure state updates properly
-    const newUser = { ...updatedUser };
+    if (!updatedUser.id || !updatedUser.name) {
+      console.error('Invalid user data:', updatedUser);
+      return;
+    }
     
-    // Update the state
+    // Make a deep copy to avoid reference issues
+    const newUser: User = JSON.parse(JSON.stringify(updatedUser));
+    
+    // Update React state
     setCurrentUser(newUser);
     
-    // Persist to localStorage
-    localStorage.setItem('user', JSON.stringify(newUser));
+    // Update localStorage (avoid race conditions by using a callback)
+    const updateStorage = () => {
+      try {
+        localStorage.setItem('user', JSON.stringify(newUser));
+        console.log('User saved in localStorage:', JSON.stringify(newUser));
+      } catch (error) {
+        console.error('Error saving user to localStorage:', error);
+      }
+    };
     
-    // Force update of localStorage in case there's a race condition
-    setTimeout(() => {
-      const savedUser = localStorage.getItem('user');
-      console.log('User saved in localStorage:', savedUser);
-    }, 100);
+    // Execute immediately and also schedule as a microtask
+    updateStorage();
+    queueMicrotask(updateStorage);
   };
 
   const login = async (email: string, password: string) => {
     // This is a mock implementation
-    // In a real app, you would call your authentication API
     return new Promise<void>((resolve, reject) => {
       setTimeout(() => {
         // Simple validation for demo purposes
@@ -103,6 +112,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             };
           }
           
+          // Update state and localStorage
           setCurrentUser(user);
           setIsAuthenticated(true);
           localStorage.setItem('isLoggedIn', 'true');
