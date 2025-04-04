@@ -1,4 +1,3 @@
-
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { User } from '@/types';
 import { useToast } from '@/hooks/use-toast';
@@ -39,32 +38,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const updateUserProfile = (updatedUser: User) => {
-    console.log('Updating user profile:', updatedUser);
+    console.log('AuthContext: Updating user profile:', updatedUser);
     
     if (!updatedUser.id || !updatedUser.name) {
       console.error('Invalid user data:', updatedUser);
       return;
     }
     
-    // Make a deep copy to avoid reference issues
+    // Create a deep copy to avoid reference issues
     const newUser: User = JSON.parse(JSON.stringify(updatedUser));
     
-    // Update React state
+    // Update React state first
     setCurrentUser(newUser);
     
-    // Update localStorage (avoid race conditions by using a callback)
-    const updateStorage = () => {
-      try {
-        localStorage.setItem('user', JSON.stringify(newUser));
-        console.log('User saved in localStorage:', JSON.stringify(newUser));
-      } catch (error) {
-        console.error('Error saving user to localStorage:', error);
-      }
-    };
-    
-    // Execute immediately and also schedule as a microtask
-    updateStorage();
-    queueMicrotask(updateStorage);
+    // Then immediately update localStorage
+    try {
+      localStorage.setItem('user', JSON.stringify(newUser));
+      console.log('User successfully saved in localStorage:', newUser);
+    } catch (error) {
+      console.error('Error saving user to localStorage:', error);
+    }
   };
 
   const login = async (email: string, password: string) => {

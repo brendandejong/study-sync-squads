@@ -108,7 +108,14 @@ const Account = () => {
                     </div>
                     
                     <div className="flex justify-end space-x-2 pt-4">
-                      <Button variant="outline" onClick={() => setIsEditing(false)}>
+                      <Button variant="outline" onClick={() => {
+                        setIsEditing(false);
+                        // Reset form values to current user values
+                        if (currentUser) {
+                          setName(currentUser.name);
+                          setEmail(currentUser.email);
+                        }
+                      }}>
                         Cancel
                       </Button>
                       <Button onClick={handleSaveProfile}>

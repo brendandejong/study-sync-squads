@@ -1,4 +1,3 @@
-
 import { User } from '@/types';
 import { useState, useEffect } from 'react';
 import { getInitials, getRandomColor } from '@/utils/helpers';
@@ -32,7 +31,8 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   // Update local state when user prop changes or dialog opens
   useEffect(() => {
     if (isOpen && user) {
-      setEditedUser({ ...user });
+      // Create a deep copy to ensure we're not keeping references
+      setEditedUser(JSON.parse(JSON.stringify(user)));
       console.log("ProfileEditDialog received user:", user);
     }
   }, [user, isOpen]);
@@ -89,7 +89,7 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
   };
   
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Edit Your Profile</DialogTitle>
@@ -114,7 +114,20 @@ const ProfileEditDialog = ({ isOpen, onClose, user, onSave }: ProfileEditDialogP
                   type="file" 
                   className="hidden" 
                   accept="image/*" 
-                  onChange={handleAvatarChange} 
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        if (event.target) {
+                          setEditedUser({
+                            ...editedUser,
+                            avatar: event.target.result as string
+                          });
+                        }
+                      };
+                      reader.readAsDataURL(e.target.files[0]);
+                    }
+                  }} 
                 />
               </label>
             </div>

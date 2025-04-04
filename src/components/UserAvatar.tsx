@@ -1,6 +1,6 @@
 
 import { User } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import AvatarDisplay from './profile/AvatarDisplay';
 import AvatarDropdownMenu from './profile/AvatarDropdownMenu';
 import ProfileEditDialog from './profile/ProfileEditDialog';
@@ -16,12 +16,22 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
   const [isEditing, setIsEditing] = useState(false);
   const { currentUser, updateUserProfile } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [displayUser, setDisplayUser] = useState<User>(initialUser);
   
-  // Always use the most up-to-date user from context
-  const activeUser = currentUser || initialUser;
+  // Update local state when currentUser from context changes
+  useEffect(() => {
+    // Always use the currentUser from context if available, as it's the source of truth
+    if (currentUser) {
+      setDisplayUser(currentUser);
+      console.log("UserAvatar: Updated with currentUser from context:", currentUser);
+    } else if (initialUser) {
+      setDisplayUser(initialUser);
+      console.log("UserAvatar: Using initialUser:", initialUser);
+    }
+  }, [currentUser, initialUser]);
   
   // If no user is available, don't render anything
-  if (!activeUser || !activeUser.name) {
+  if (!displayUser || !displayUser.name) {
     console.log("UserAvatar: No valid user available");
     return null;
   }
@@ -37,6 +47,9 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
     
     // Update the user in context and localStorage
     updateUserProfile(updatedUser);
+    
+    // Also update local state to immediately reflect changes
+    setDisplayUser(updatedUser);
     setIsEditing(false);
   };
 
@@ -45,7 +58,7 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
     setDropdownOpen(false);
   };
 
-  const avatarDisplay = <AvatarDisplay user={activeUser} sizeClass={sizeClasses[size]} />;
+  const avatarDisplay = <AvatarDisplay user={displayUser} sizeClass={sizeClasses[size]} />;
 
   if (!showDropdown) {
     return avatarDisplay;
@@ -54,7 +67,7 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
   return (
     <>
       <AvatarDropdownMenu 
-        user={activeUser}
+        user={displayUser}
         sizeClass={sizeClasses[size]}
         avatarDisplay={avatarDisplay}
         onEditProfile={handleEditOpen}
@@ -65,7 +78,7 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
       <ProfileEditDialog 
         isOpen={isEditing}
         onClose={() => setIsEditing(false)}
-        user={activeUser}
+        user={displayUser}
         onSave={handleSaveProfile}
       />
     </>
