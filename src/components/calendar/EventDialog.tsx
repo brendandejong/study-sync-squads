@@ -60,7 +60,16 @@ const EventDialog: React.FC<EventDialogProps> = ({
   }), [event, selectedDate]);
   
   const handleSubmit = (values: EventFormValues) => {
-    onSave(values);
+    // Ensure we convert form values to match UserEvent type
+    const eventData: Omit<UserEvent, "id"> = {
+      title: values.title,
+      date: values.date,
+      startTime: values.startTime,
+      endTime: values.endTime,
+      description: values.description || "", // Ensure description is always a string
+    };
+    
+    onSave(eventData);
     onClose();
   };
 
@@ -108,7 +117,7 @@ const EventDialog: React.FC<EventDialogProps> = ({
             <Button type="button" onClick={() => {
               // Find the hidden submit button in the form and click it
               const form = document.querySelector("form");
-              const submitButton = form?.querySelector('button[type="submit"]');
+              const submitButton = form?.querySelector('button[type="submit"]') as HTMLButtonElement | null;
               submitButton?.click();
             }}>
               {isCreateMode ? "Save Event" : "Update Event"}

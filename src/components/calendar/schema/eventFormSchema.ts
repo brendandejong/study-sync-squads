@@ -8,7 +8,7 @@ export const eventFormSchema = z.object({
   }),
   startTime: z.string().min(1, "Start time is required"),
   endTime: z.string().min(1, "End time is required"),
-  description: z.string().optional(),
+  description: z.string().optional().default(""),
 });
 
 export type EventFormValues = z.infer<typeof eventFormSchema>;
