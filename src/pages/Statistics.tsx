@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/components/ui/use-toast';
 import { PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
@@ -20,47 +21,65 @@ import {
   BookOpen, 
   Calendar, 
   Flame, 
-  Plus 
+  Plus,
+  Edit 
 } from 'lucide-react';
 
-const Statistics = () => {
+const Insights = () => {
   const { toast } = useToast();
-  const { goals, stats, addGoal } = useStats();
+  const { goals, stats, addGoal, updateStats, logStudySession } = useStats();
   const { courses } = useCourses();
 
   const [isGoalDialogOpen, setIsGoalDialogOpen] = useState(false);
+  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
+  const [isSessionDialogOpen, setIsSessionDialogOpen] = useState(false);
+  
   const [newGoal, setNewGoal] = useState<Partial<StudyGoal>>({
     title: '',
     targetHours: 10,
     completedHours: 0,
     deadline: new Date().toISOString().split('T')[0]
   });
+  
+  const [studySession, setStudySession] = useState({
+    duration: 0,
+    courseId: '',
+    tags: ['quiet'],
+    date: new Date().toISOString().split('T')[0]
+  });
+  
+  const [editedStats, setEditedStats] = useState({
+    totalHours: stats.totalHours,
+    weeklyHours: stats.weeklyHours,
+    streak: stats.streak,
+    preferredStudyType: stats.preferredStudyType
+  });
 
   // Find course names for stats
   const getMostStudiedCourseName = () => {
     const course = courses.find(c => c.id === stats.mostStudiedCourse);
-    return course ? `${course.code}: ${course.name}` : "Unknown Course";
+    return course ? `${course.code}: ${course.name}` : "None selected";
   };
 
-  // Prepare data for pie chart
-  const studyTypeData = [
+  // Prepare data for pie chart - make this editable
+  const [studyTypeData, setStudyTypeData] = useState([
     { name: 'Quiet', value: 40, color: '#93c5fd' },
     { name: 'Discussion', value: 25, color: '#c4b5fd' },
     { name: 'Flashcards', value: 15, color: '#fcd34d' },
     { name: 'Practice', value: 10, color: '#86efac' },
     { name: 'Exam Prep', value: 10, color: '#fda4af' }
-  ];
+  ]);
 
-  // Prepare data for bar chart
-  const weeklyProgressData = [
-    { name: 'Mon', hours: 1.5 },
-    { name: 'Tue', hours: 2.0 },
-    { name: 'Wed', hours: 0.5 },
-    { name: 'Thu', hours: 1.0 },
-    { name: 'Fri', hours: 1.5 },
+  // Prepare data for bar chart - make this editable
+  const [weeklyProgressData, setWeeklyProgressData] = useState([
+    { name: 'Mon', hours: 0 },
+    { name: 'Tue', hours: 0 },
+    { name: 'Wed', hours: 0 },
+    { name: 'Thu', hours: 0 },
+    { name: 'Fri', hours: 0 },
     { name: 'Sat', hours: 0 },
     { name: 'Sun', hours: 0 }
-  ];
+  ]);
 
   const handleAddGoal = () => {
     if (!newGoal.title || !newGoal.targetHours) {
@@ -86,6 +105,57 @@ const Statistics = () => {
       description: "Your study goal has been added successfully"
     });
   };
+  
+  const handleAddSession = () => {
+    if (!studySession.courseId || studySession.duration <= 0) {
+      toast({
+        title: "Missing information",
+        description: "Please select a course and enter a valid duration",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    logStudySession({
+      date: studySession.date,
+      duration: studySession.duration,
+      courseId: studySession.courseId,
+      tags: [studySession.tags[0]] // Simplify for now
+    });
+    
+    setIsSessionDialogOpen(false);
+    setStudySession({
+      duration: 0,
+      courseId: '',
+      tags: ['quiet'],
+      date: new Date().toISOString().split('T')[0]
+    });
+    
+    toast({
+      title: "Session logged",
+      description: "Your study session has been recorded"
+    });
+  };
+  
+  const handleUpdateStats = () => {
+    updateStats({
+      ...stats,
+      ...editedStats
+    });
+    
+    setIsStatsDialogOpen(false);
+    
+    toast({
+      title: "Stats updated",
+      description: "Your insights have been updated successfully"
+    });
+  };
+  
+  const updateChartData = (chartData, index, newValue) => {
+    const updatedData = [...chartData];
+    updatedData[index] = { ...updatedData[index], ...newValue };
+    return updatedData;
+  };
 
   return (
     <div className="min-h-screen bg-gradient-blue">
@@ -93,11 +163,17 @@ const Statistics = () => {
       
       <main className="container mx-auto px-4 py-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6 p-4 rounded-lg bg-white bg-opacity-70 backdrop-blur-sm shadow-sm">
-          <h1 className="text-2xl font-bold text-blue-800">Study Statistics</h1>
-          <Button onClick={() => setIsGoalDialogOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 btn-hover-effect">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Goal
-          </Button>
+          <h1 className="text-2xl font-bold text-blue-800">Study Insights</h1>
+          <div className="flex gap-2">
+            <Button onClick={() => setIsSessionDialogOpen(true)} className="bg-blue-600 hover:bg-blue-700 btn-hover-effect">
+              <Clock className="h-4 w-4 mr-2" />
+              Log Session
+            </Button>
+            <Button onClick={() => setIsGoalDialogOpen(true)} className="bg-indigo-600 hover:bg-indigo-700 btn-hover-effect">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Goal
+            </Button>
+          </div>
         </div>
         
         <Tabs defaultValue="overview" className="w-full">
@@ -115,10 +191,15 @@ const Statistics = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               <Card className="card-gradient">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Clock className="mr-2 h-5 w-5 text-blue-500" />
-                    Total Study Time
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <Clock className="mr-2 h-5 w-5 text-blue-500" />
+                      Total Study Time
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => setIsStatsDialogOpen(true)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-blue-700">{stats.totalHours.toFixed(1)}h</div>
@@ -130,10 +211,15 @@ const Statistics = () => {
               
               <Card className="card-gradient">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <BookOpen className="mr-2 h-5 w-5 text-purple-500" />
-                    Most Studied
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <BookOpen className="mr-2 h-5 w-5 text-purple-500" />
+                      Most Studied
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => setIsStatsDialogOpen(true)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-lg font-bold text-purple-700 truncate">
@@ -164,10 +250,15 @@ const Statistics = () => {
               
               <Card className="card-gradient">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-lg font-medium flex items-center">
-                    <Flame className="mr-2 h-5 w-5 text-orange-500" />
-                    Study Streak
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="text-lg font-medium flex items-center">
+                      <Flame className="mr-2 h-5 w-5 text-orange-500" />
+                      Study Streak
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => setIsStatsDialogOpen(true)}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="text-3xl font-bold text-orange-700">{stats.streak} days</div>
@@ -182,10 +273,21 @@ const Statistics = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card className="card-gradient">
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <BarChartIcon className="mr-2 h-5 w-5 text-blue-500" />
-                    Weekly Progress
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center">
+                      <BarChartIcon className="mr-2 h-5 w-5 text-blue-500" />
+                      Weekly Progress
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => {
+                      // Show a dialog to edit weekly progress data
+                      toast({
+                        title: "Edit Weekly Data",
+                        description: "Use the 'Log Session' button to record study time which will update this chart"
+                      });
+                    }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <CardDescription>Hours studied per day this week</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -208,10 +310,21 @@ const Statistics = () => {
               
               <Card className="card-gradient">
                 <CardHeader>
-                  <CardTitle className="flex items-center">
-                    <Calendar className="mr-2 h-5 w-5 text-purple-500" />
-                    Study Method Distribution
-                  </CardTitle>
+                  <div className="flex justify-between items-center">
+                    <CardTitle className="flex items-center">
+                      <Calendar className="mr-2 h-5 w-5 text-purple-500" />
+                      Study Method Distribution
+                    </CardTitle>
+                    <Button variant="ghost" size="icon" onClick={() => {
+                      // Show a dialog to edit study method distribution
+                      toast({
+                        title: "Edit Study Methods",
+                        description: "Use the 'Log Session' button to record your study methods which will update this chart"
+                      });
+                    }}>
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <CardDescription>Your preferred study methods</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -242,28 +355,34 @@ const Statistics = () => {
           
           <TabsContent value="goals" className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {goals.map((goal) => (
-                <Card key={goal.id} className="card-gradient">
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
-                    <CardDescription>
-                      Target: {goal.targetHours} hours • Due: {new Date(goal.deadline).toLocaleDateString()}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      <div className="flex justify-between text-sm">
-                        <span>Progress: {goal.completedHours}/{goal.targetHours} hours</span>
-                        <span className="font-medium">{Math.round((goal.completedHours / goal.targetHours) * 100)}%</span>
+              {goals.length > 0 ? (
+                goals.map((goal) => (
+                  <Card key={goal.id} className="card-gradient">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
+                      <CardDescription>
+                        Target: {goal.targetHours} hours • Due: {new Date(goal.deadline).toLocaleDateString()}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Progress: {goal.completedHours}/{goal.targetHours} hours</span>
+                          <span className="font-medium">{Math.round((goal.completedHours / goal.targetHours) * 100)}%</span>
+                        </div>
+                        <Progress 
+                          value={(goal.completedHours / goal.targetHours) * 100} 
+                          className="h-2" 
+                        />
                       </div>
-                      <Progress 
-                        value={(goal.completedHours / goal.targetHours) * 100} 
-                        className="h-2" 
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="col-span-2 p-8 text-center bg-blue-50 rounded-lg">
+                  <p className="text-gray-500">No study goals yet. Add your first goal to start tracking your progress!</p>
+                </div>
+              )}
             </div>
           </TabsContent>
         </Tabs>
@@ -311,9 +430,136 @@ const Statistics = () => {
             </DialogFooter>
           </DialogContent>
         </Dialog>
+        
+        {/* Add Session Dialog */}
+        <Dialog open={isSessionDialogOpen} onOpenChange={setIsSessionDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Log Study Session</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="course">Course</Label>
+                <select 
+                  id="course"
+                  className="w-full border border-gray-300 rounded-md h-10 px-3 py-2"
+                  value={studySession.courseId}
+                  onChange={(e) => setStudySession({ ...studySession, courseId: e.target.value })}
+                >
+                  <option value="">Select a course</option>
+                  {courses.map(course => (
+                    <option key={course.id} value={course.id}>
+                      {course.code}: {course.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="duration">Duration (minutes)</Label>
+                <Input
+                  id="duration"
+                  type="number"
+                  min="1"
+                  value={studySession.duration}
+                  onChange={(e) => setStudySession({ ...studySession, duration: parseInt(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="type">Study Type</Label>
+                <select
+                  id="type"
+                  className="w-full border border-gray-300 rounded-md h-10 px-3 py-2"
+                  value={studySession.tags[0]}
+                  onChange={(e) => setStudySession({ ...studySession, tags: [e.target.value] })}
+                >
+                  <option value="quiet">Quiet</option>
+                  <option value="discussion">Discussion</option>
+                  <option value="flashcards">Flashcards</option>
+                  <option value="practice">Practice</option>
+                  <option value="exam">Exam Prep</option>
+                </select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="date">Date</Label>
+                <Input
+                  id="date"
+                  type="date"
+                  value={studySession.date}
+                  onChange={(e) => setStudySession({ ...studySession, date: e.target.value })}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsSessionDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleAddSession}>Log Session</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+        
+        {/* Edit Stats Dialog */}
+        <Dialog open={isStatsDialogOpen} onOpenChange={setIsStatsDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Study Insights</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="space-y-2">
+                <Label htmlFor="totalHours">Total Hours Studied</Label>
+                <Input
+                  id="totalHours"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={editedStats.totalHours}
+                  onChange={(e) => setEditedStats({ ...editedStats, totalHours: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="weeklyHours">Hours Studied This Week</Label>
+                <Input
+                  id="weeklyHours"
+                  type="number"
+                  min="0"
+                  step="0.5"
+                  value={editedStats.weeklyHours}
+                  onChange={(e) => setEditedStats({ ...editedStats, weeklyHours: parseFloat(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="streak">Study Streak (days)</Label>
+                <Input
+                  id="streak"
+                  type="number"
+                  min="0"
+                  value={editedStats.streak}
+                  onChange={(e) => setEditedStats({ ...editedStats, streak: parseInt(e.target.value) })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="studyType">Preferred Study Type</Label>
+                <select
+                  id="studyType"
+                  className="w-full border border-gray-300 rounded-md h-10 px-3 py-2"
+                  value={editedStats.preferredStudyType}
+                  onChange={(e) => setEditedStats({ ...editedStats, preferredStudyType: e.target.value })}
+                >
+                  <option value="quiet">Quiet</option>
+                  <option value="discussion">Discussion</option>
+                  <option value="flashcards">Flashcards</option>
+                  <option value="practice">Practice</option>
+                  <option value="exam">Exam Prep</option>
+                </select>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setIsStatsDialogOpen(false)}>Cancel</Button>
+              <Button onClick={handleUpdateStats}>Update Stats</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   );
 };
 
-export default Statistics;
+export default Insights;

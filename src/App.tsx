@@ -58,6 +58,11 @@ const App = () => (
                   <Statistics />
                 </ProtectedRoute>
               } />
+              <Route path="/insights" element={
+                <ProtectedRoute>
+                  <Statistics />
+                </ProtectedRoute>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

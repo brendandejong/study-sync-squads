@@ -31,84 +31,26 @@ export const useStats = () => {
   // Load study goals from localStorage
   const [goals, setGoals] = useState<StudyGoal[]>(() => {
     const savedGoals = localStorage.getItem('studyGoals');
-    return savedGoals ? JSON.parse(savedGoals) : [
-      {
-        id: "goal-1",
-        title: "Complete Calculus Review",
-        targetHours: 20,
-        completedHours: 12,
-        deadline: "2025-05-15",
-      },
-      {
-        id: "goal-2",
-        title: "Python Programming Project",
-        targetHours: 15,
-        completedHours: 5,
-        deadline: "2025-04-30",
-      },
-      {
-        id: "goal-3",
-        title: "Essay Research",
-        targetHours: 10,
-        completedHours: 8,
-        deadline: "2025-04-20",
-      }
-    ];
+    return savedGoals ? JSON.parse(savedGoals) : [];
   });
 
   // Load study sessions from localStorage
   const [sessions, setSessions] = useState<StudySession[]>(() => {
     const savedSessions = localStorage.getItem('studySessions');
-    return savedSessions ? JSON.parse(savedSessions) : [
-      {
-        id: "session-1",
-        date: "2025-04-01",
-        duration: 90,
-        courseId: "course-1",
-        tags: ["quiet", "flashcards"]
-      },
-      {
-        id: "session-2",
-        date: "2025-04-02",
-        duration: 120,
-        courseId: "course-2",
-        tags: ["discussion"]
-      },
-      {
-        id: "session-3",
-        date: "2025-04-03",
-        duration: 60,
-        courseId: "course-1",
-        tags: ["exam"]
-      },
-      {
-        id: "session-4",
-        date: "2025-04-03",
-        duration: 45,
-        courseId: "course-3",
-        tags: ["quiet"]
-      },
-      {
-        id: "session-5",
-        date: "2025-04-04",
-        duration: 75,
-        courseId: "course-2",
-        tags: ["practice"]
-      }
-    ];
+    return savedSessions ? JSON.parse(savedSessions) : [];
   });
 
-  // Load study stats from localStorage or calculate them
+  // Load study stats from localStorage or use default empty stats
   const [stats, setStats] = useState<StudyStats>(() => {
     const savedStats = localStorage.getItem('studyStats');
     return savedStats ? JSON.parse(savedStats) : {
-      totalHours: 6.5,
-      weeklyHours: 6.5,
-      monthlyHours: 6.5,
+      totalHours: 0,
+      weeklyHours: 0,
+      monthlyHours: 0,
       preferredStudyType: "quiet",
       preferredTime: "evening",
-      streak: 4,
-      mostStudiedCourse: "course-1"
+      streak: 0,
+      mostStudiedCourse: ""
     };
   });
 
@@ -164,65 +106,47 @@ export const useStats = () => {
     
     // Update any related goals
     const sessionHours = session.duration / 60;
-    // For demo purposes, just update the first goal
+    
+    // If there are any goals, update the first one for simplicity
     if (goals.length > 0) {
       updateGoalProgress(goals[0].id, sessionHours);
     }
     
-    // Recalculate stats
-    calculateStats();
+    // Update stats based on this session
+    const updatedStats = { ...stats };
+    updatedStats.totalHours += sessionHours;
+    updatedStats.weeklyHours += sessionHours;
+    updatedStats.monthlyHours += sessionHours;
+    
+    // Update the mostStudiedCourse if this session is longer than previous ones
+    const courseSessions = sessions.filter(s => s.courseId === session.courseId);
+    const totalCourseMinutes = courseSessions.reduce((total, s) => total + s.duration, 0) + session.duration;
+    
+    // Find the current most studied course and its total time
+    let currentMostStudiedMinutes = 0;
+    if (stats.mostStudiedCourse) {
+      currentMostStudiedMinutes = sessions
+        .filter(s => s.courseId === stats.mostStudiedCourse)
+        .reduce((total, s) => total + s.duration, 0);
+    }
+    
+    // If this course has more study time, make it the most studied
+    if (totalCourseMinutes > currentMostStudiedMinutes) {
+      updatedStats.mostStudiedCourse = session.courseId;
+    }
+    
+    // Update preferred study type
+    if (session.tags.length > 0) {
+      // For simplicity, just use the first tag
+      updatedStats.preferredStudyType = session.tags[0];
+    }
+    
+    setStats(updatedStats);
   };
 
-  // Calculate statistics from sessions
-  const calculateStats = () => {
-    // This would normally be a more complex calculation based on all sessions
-    // For demo purposes, we'll just update a few values
-    
-    const totalMinutes = sessions.reduce((total, session) => total + session.duration, 0);
-    const totalHours = totalMinutes / 60;
-    
-    // Count tag occurrences to find preferred study type
-    const tagCounts: Record<string, number> = {};
-    sessions.forEach(session => {
-      session.tags.forEach(tag => {
-        tagCounts[tag] = (tagCounts[tag] || 0) + 1;
-      });
-    });
-    
-    // Find the most frequent tag
-    let preferredStudyType = stats.preferredStudyType;
-    let maxCount = 0;
-    Object.entries(tagCounts).forEach(([tag, count]) => {
-      if (count > maxCount) {
-        maxCount = count;
-        preferredStudyType = tag;
-      }
-    });
-    
-    // Count course occurrences to find most studied course
-    const courseCounts: Record<string, number> = {};
-    sessions.forEach(session => {
-      courseCounts[session.courseId] = (courseCounts[session.courseId] || 0) + session.duration;
-    });
-    
-    // Find the course with most study time
-    let mostStudiedCourse = stats.mostStudiedCourse;
-    let maxDuration = 0;
-    Object.entries(courseCounts).forEach(([courseId, duration]) => {
-      if (duration > maxDuration) {
-        maxDuration = duration;
-        mostStudiedCourse = courseId;
-      }
-    });
-    
-    setStats({
-      ...stats,
-      totalHours,
-      weeklyHours: totalHours, // Simplified for demo
-      monthlyHours: totalHours, // Simplified for demo
-      preferredStudyType,
-      mostStudiedCourse
-    });
+  // Update stats directly (manual override)
+  const updateStats = (newStats: StudyStats) => {
+    setStats(newStats);
   };
 
   return {
@@ -232,6 +156,7 @@ export const useStats = () => {
     addGoal,
     updateGoalProgress,
     deleteGoal,
-    logStudySession
+    logStudySession,
+    updateStats
   };
 };
