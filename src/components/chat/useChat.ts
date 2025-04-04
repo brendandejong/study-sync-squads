@@ -1,11 +1,11 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { ChatMessage, INITIAL_MESSAGES } from './types';
 import { fetchAIResponse, generateLocalResponse } from './chatService';
 import { extractEventFromMessage } from '@/utils/calendarUtils';
-import { useCalendar } from '@/hooks/useCalendar';
 import { UserEvent } from '@/types/calendar';
+import { useCalendar } from '@/hooks/useCalendar';
 
 // Embedded API key for Gemini API - Replace this with your actual API key
 const EMBEDDED_API_KEY = "AIzaSyAB5URZseUfBH8OsaJA9hHVh4jlgI6HA24";
