@@ -12,7 +12,14 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Settings, User as UserIcon, LogOut, Mail } from 'lucide-react';
 import { useState } from 'react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogClose
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
@@ -81,95 +88,103 @@ const UserAvatar = ({ user, size = 'md', showDropdown = false }: UserAvatarProps
   }
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
-          {avatarDisplay}
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{user.name}</p>
-            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
-          </div>
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <Popover open={isEditing} onOpenChange={setIsEditing}>
-          <PopoverTrigger asChild>
-            <DropdownMenuItem onSelect={(e) => {
-              e.preventDefault();
-              setIsEditing(true);
-            }}>
-              <UserIcon className="mr-2 h-4 w-4" />
-              <span>Edit Profile</span>
-            </DropdownMenuItem>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-4" forceMount>
-            <div className="space-y-4">
-              <h4 className="font-medium text-sm">Edit Your Profile</h4>
-              <div className="flex flex-col space-y-2">
-                <div className="flex justify-center mb-2">
-                  <div className="relative">
-                    <Avatar className="h-16 w-16 text-lg">
-                      <AvatarImage src={editedUser.avatar} alt={editedUser.name} />
-                      <AvatarFallback className={bgColor}>{getInitials(editedUser.name)}</AvatarFallback>
-                    </Avatar>
-                    <label 
-                      htmlFor="avatar-upload" 
-                      className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer"
-                    >
-                      <Settings className="h-3 w-3" />
-                      <input 
-                        id="avatar-upload" 
-                        type="file" 
-                        className="hidden" 
-                        accept="image/*" 
-                        onChange={handleAvatarChange} 
-                      />
-                    </label>
-                  </div>
-                </div>
-                <label className="text-xs">Name</label>
-                <Input 
-                  value={editedUser.name} 
-                  onChange={(e) => setEditedUser({...editedUser, name: e.target.value})}
-                />
-                
-                <label className="text-xs">Email</label>
-                <Input 
-                  value={editedUser.email} 
-                  onChange={(e) => setEditedUser({...editedUser, email: e.target.value})}
-                  type="email"
-                  placeholder="your@email.com"
-                  className="mb-2"
-                />
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-full">
+            {avatarDisplay}
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-56">
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={(e) => {
+            e.preventDefault();
+            setIsEditing(true);
+          }}>
+            <UserIcon className="mr-2 h-4 w-4" />
+            <span>Edit Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Settings</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Log out</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-                <label className="text-xs">Bio</label>
-                <Input 
-                  value={editedUser.bio || ''} 
-                  onChange={(e) => setEditedUser({...editedUser, bio: e.target.value})}
-                  placeholder="Tell us about yourself"
-                />
-                <div className="flex justify-end space-x-2 pt-2">
-                  <Button variant="outline" size="sm" onClick={() => setIsEditing(false)}>Cancel</Button>
-                  <Button size="sm" onClick={handleSaveProfile}>Save</Button>
-                </div>
+      {/* Profile edit dialog that won't disappear on mouse movement */}
+      <Dialog open={isEditing} onOpenChange={setIsEditing}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Your Profile</DialogTitle>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="flex justify-center mb-2">
+              <div className="relative">
+                <Avatar className="h-16 w-16 text-lg">
+                  <AvatarImage src={editedUser.avatar} alt={editedUser.name} />
+                  <AvatarFallback className={bgColor}>{getInitials(editedUser.name)}</AvatarFallback>
+                </Avatar>
+                <label 
+                  htmlFor="avatar-upload" 
+                  className="absolute bottom-0 right-0 bg-primary text-white rounded-full p-1 cursor-pointer"
+                >
+                  <Settings className="h-3 w-3" />
+                  <input 
+                    id="avatar-upload" 
+                    type="file" 
+                    className="hidden" 
+                    accept="image/*" 
+                    onChange={handleAvatarChange} 
+                  />
+                </label>
               </div>
             </div>
-          </PopoverContent>
-        </Popover>
-        <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium" htmlFor="name">Name</label>
+              <Input 
+                id="name"
+                value={editedUser.name} 
+                onChange={(e) => setEditedUser({...editedUser, name: e.target.value})}
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium" htmlFor="email">Email</label>
+              <Input 
+                id="email"
+                value={editedUser.email} 
+                onChange={(e) => setEditedUser({...editedUser, email: e.target.value})}
+                type="email"
+                placeholder="your@email.com"
+              />
+            </div>
+            <div className="grid gap-2">
+              <label className="text-sm font-medium" htmlFor="bio">Bio</label>
+              <Input 
+                id="bio"
+                value={editedUser.bio || ''} 
+                onChange={(e) => setEditedUser({...editedUser, bio: e.target.value})}
+                placeholder="Tell us about yourself"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditing(false)}>Cancel</Button>
+            <Button onClick={handleSaveProfile}>Save changes</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 };
 
