@@ -20,8 +20,15 @@ export const useCourses = () => {
     setCourses(updatedCourses);
   };
 
+  // Delete a course
+  const deleteCourse = (courseId: string) => {
+    const updatedCourses = courses.filter(course => course.id !== courseId);
+    setCourses(updatedCourses);
+  };
+
   return {
     courses,
-    addCourse
+    addCourse,
+    deleteCourse
   };
 };

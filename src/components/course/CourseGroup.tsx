@@ -8,9 +8,10 @@ interface CourseGroupProps {
   courses: Course[];
   selectedCourse: Course | null;
   onSelectCourse: (course: Course) => void;
+  onDeleteCourse?: (courseId: string) => void;
 }
 
-const CourseGroup = ({ subject, courses, selectedCourse, onSelectCourse }: CourseGroupProps) => {
+const CourseGroup = ({ subject, courses, selectedCourse, onSelectCourse, onDeleteCourse }: CourseGroupProps) => {
   return (
     <div className="mb-2">
       <div className="px-2 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -22,6 +23,7 @@ const CourseGroup = ({ subject, courses, selectedCourse, onSelectCourse }: Cours
           course={course}
           isSelected={selectedCourse?.id === course.id}
           onSelect={() => onSelectCourse(course)}
+          onDelete={onDeleteCourse}
         />
       ))}
     </div>

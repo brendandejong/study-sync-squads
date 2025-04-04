@@ -15,6 +15,7 @@ interface CourseDropdownProps {
   groupedCourses: GroupedCourses;
   selectedCourse: Course | null;
   onSelectCourse: (course: Course) => void;
+  onDeleteCourse?: (courseId: string) => void;
   onAddCourseClick: () => void;
   closeDropdown: () => void;
 }
@@ -25,6 +26,7 @@ const CourseDropdown = ({
   groupedCourses,
   selectedCourse,
   onSelectCourse,
+  onDeleteCourse,
   onAddCourseClick,
   closeDropdown
 }: CourseDropdownProps) => {
@@ -57,6 +59,7 @@ const CourseDropdown = ({
                   onSelectCourse(course);
                   closeDropdown();
                 }}
+                onDeleteCourse={onDeleteCourse}
               />
             ))}
           </div>

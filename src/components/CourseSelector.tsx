@@ -7,6 +7,7 @@ import { getSubjectColorClass } from '@/utils/subjectUtils';
 import { useCourses } from '@/hooks/useCourses';
 import CourseDropdown from './course/CourseDropdown';
 import AddCourseDialog from './course/AddCourseDialog';
+import { useToast } from '@/components/ui/use-toast';
 
 interface CourseSelectorProps {
   selectedCourse: Course | null;
@@ -18,8 +19,9 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
   const [searchTerm, setSearchTerm] = useState('');
   const dropdownRef = useRef<HTMLDivElement>(null);
   const [isAddCourseDialogOpen, setIsAddCourseDialogOpen] = useState(false);
+  const { toast } = useToast();
   
-  const { courses, addCourse } = useCourses();
+  const { courses, addCourse, deleteCourse } = useCourses();
   
   // Filter courses based on search term
   const filteredCourses = courses.filter(course => 
@@ -54,6 +56,24 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
 
   const handleAddCourse = (course: Course) => {
     addCourse(course);
+    toast({
+      title: "Course added",
+      description: `${course.code} - ${course.name} has been added to your courses.`
+    });
+  };
+
+  const handleDeleteCourse = (courseId: string) => {
+    // If the course being deleted is currently selected, deselect it
+    if (selectedCourse && selectedCourse.id === courseId) {
+      onSelectCourse(null);
+    }
+    
+    deleteCourse(courseId);
+    toast({
+      title: "Course deleted",
+      description: "The course has been removed from your list.",
+      variant: "default"
+    });
   };
 
   const handleSelectCourse = (course: Course) => {
@@ -89,6 +109,7 @@ const CourseSelector = ({ selectedCourse, onSelectCourse }: CourseSelectorProps)
           groupedCourses={groupedCourses}
           selectedCourse={selectedCourse}
           onSelectCourse={handleSelectCourse}
+          onDeleteCourse={handleDeleteCourse}
           onAddCourseClick={() => setIsAddCourseDialogOpen(true)}
           closeDropdown={() => setOpen(false)}
         />

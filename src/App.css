@@ -110,3 +110,99 @@
   opacity: 0.5;
   z-index: -1;
 }
+
+/* Tag styling */
+.tag-quiet {
+  background-color: #f0fdfa;
+  color: #0d9488;
+}
+
+.tag-flashcards {
+  background-color: #f0f9ff;
+  color: #0369a1;
+}
+
+.tag-exam {
+  background-color: #fef2f2;
+  color: #b91c1c;
+}
+
+.tag-discussion {
+  background-color: #f5f3ff;
+  color: #6d28d9;
+}
+
+.tag-practice {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+/* Course subject colors */
+.subject-math {
+  background-color: #a5b4fc;
+}
+
+.subject-science {
+  background-color: #bae6fd;
+}
+
+.subject-arts {
+  background-color: #fda4af;
+}
+
+.subject-language {
+  background-color: #c4b5fd;
+}
+
+.subject-history {
+  background-color: #fcd34d;
+}
+
+.subject-business {
+  background-color: #86efac;
+}
+
+.subject-tech {
+  background-color: #93c5fd;
+}
+
+/* Card gradient */
+.card-gradient {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(248, 250, 252, 0.8) 100%);
+}
+
+/* Pastel background colors */
+.bg-pastel-blue {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.bg-pastel-green {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.bg-pastel-pink {
+  background-color: #fce7f3;
+  color: #be185d;
+}
+
+.bg-pastel-purple {
+  background-color: #f3e8ff;
+  color: #7e22ce;
+}
+
+.bg-pastel-yellow {
+  background-color: #fef9c3;
+  color: #a16207;
+}
+
+.bg-pastel-orange {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+.bg-pastel-lavender {
+  background-color: #ede9fe;
+  color: #6d28d9;
+}
