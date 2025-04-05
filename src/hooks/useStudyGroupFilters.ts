@@ -29,9 +29,9 @@ export const useStudyGroupFilters = (
   console.log('User is member of these groups:', userGroups.map(g => g.id));
   console.log('Show My Groups flag is set to:', showMyGroups);
 
-  // Determine which groups to display based on current view
-  const filteredGroups = showMyGroups
-    ? userGroups // When on My Groups tab, ONLY show user's groups
+  // Return different groups based on showMyGroups value
+  const filteredGroups = showMyGroups 
+    ? userGroups // When "My Groups" is selected, ONLY show user's groups
     : studyGroups.filter(group => {
         // For "All Groups" view, apply course and tag filters
         
@@ -61,6 +61,7 @@ export const useStudyGroupFilters = (
                (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
       });
 
+  console.log('Filtered groups count:', filteredGroups.length);
   console.log('Filtered groups when showMyGroups =', showMyGroups, ':', filteredGroups.map(g => g.id));
   
   return {

@@ -14,6 +14,7 @@ interface StudyGroupListProps {
   selectedCourse: string | null;
   activeFilters: StudyTag[];
   currentUser?: User | null;
+  showMyGroups?: boolean;  // Added this prop
 }
 
 const StudyGroupList: React.FC<StudyGroupListProps> = ({
@@ -22,14 +23,15 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   onCreateClick,
   selectedCourse,
   activeFilters,
-  currentUser
+  currentUser,
+  showMyGroups = false  // Default to false
 }) => {
   const { currentUser: authUser } = useAuth();
   const location = useLocation();
   
   // Use provided currentUser or fallback to authUser
   const user = currentUser || authUser;
-  const isMyGroupsTab = location.pathname === '/my-groups' || window.location.href.includes('my-groups=true');
+  const isMyGroupsTab = showMyGroups || location.pathname === '/my-groups';
   
   // Detailed console logs for debugging
   console.log('StudyGroupList - Groups to display:', studyGroups.map(g => g.id));
@@ -39,7 +41,7 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   
   const emptyStateMessage = () => {
     // If we're on the My Groups tab
-    if (isMyGroupsTab || window.location.href.includes('my-groups=true')) {
+    if (isMyGroupsTab) {
       return "You haven't joined any study groups yet. Join some groups or create your own!";
     }
     

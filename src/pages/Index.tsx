@@ -39,25 +39,28 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const [isGroupDetailsOpen, setIsGroupDetailsOpen] = useState(false);
   
   // Determine if we should show My Groups based on props or URL
-  const [showMyGroups, setShowMyGroups] = useState<boolean>(
-    myGroupsOnly || location.pathname === '/my-groups'
-  );
-  
-  // Ensure showMyGroups updates if we navigate
-  useEffect(() => {
-    const isMyGroupsPath = location.pathname === '/my-groups';
-    console.log('Index - Path changed to:', location.pathname, 'isMyGroupsPath:', isMyGroupsPath);
-    setShowMyGroups(isMyGroupsPath || myGroupsOnly);
-  }, [location.pathname, myGroupsOnly]);
+  const initialShowMyGroups = myGroupsOnly || location.pathname === '/my-groups';
+  console.log('Initial showMyGroups value:', initialShowMyGroups);
   
   const { 
+    showMyGroups,
+    setShowMyGroups, 
     selectedCourse,
     setSelectedCourse, 
     activeFilters, 
     setActiveFilters,
     filteredGroups,
     userGroupsCount
-  } = useStudyGroupFilters(studyGroups, { showMyGroups });
+  } = useStudyGroupFilters(studyGroups, { showMyGroups: initialShowMyGroups });
+  
+  // Ensure showMyGroups updates if we navigate
+  useEffect(() => {
+    const isMyGroupsPath = location.pathname === '/my-groups';
+    console.log('Path changed to:', location.pathname, 'isMyGroupsPath:', isMyGroupsPath);
+    if (isMyGroupsPath || myGroupsOnly) {
+      setShowMyGroups(true);
+    }
+  }, [location.pathname, myGroupsOnly, setShowMyGroups]);
   
   // Event handlers
   const handleGroupClick = (groupId: string) => {

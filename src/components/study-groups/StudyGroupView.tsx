@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Course, StudyGroup, StudyTag, User } from '@/types';
 import FilterPanel from '@/components/study-groups/FilterPanel';
 import StudyGroupList from '@/components/study-groups/StudyGroupList';
@@ -34,6 +34,11 @@ const StudyGroupView: React.FC<StudyGroupViewProps> = ({
   onCreateClick,
   currentUser
 }) => {
+  // Whenever showMyGroups changes, log it
+  useEffect(() => {
+    console.log('StudyGroupView - Tab updated to:', showMyGroups ? 'My Groups' : 'All Groups');
+  }, [showMyGroups]);
+
   // Log debugging information
   console.log('StudyGroupView - Current Tab:', showMyGroups ? 'My Groups' : 'All Groups');
   console.log('StudyGroupView - Displaying groups:', filteredGroups.map(g => g.id));
@@ -77,6 +82,7 @@ const StudyGroupView: React.FC<StudyGroupViewProps> = ({
             selectedCourse={selectedCourse?.id || null}
             activeFilters={activeFilters}
             currentUser={currentUser}
+            showMyGroups={showMyGroups}
           />
         </div>
       </div>
