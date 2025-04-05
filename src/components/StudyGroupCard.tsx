@@ -30,7 +30,9 @@ const StudyGroupCard = ({ group, onClick, isOwner = false, currentUser }: StudyG
           <div className="flex items-center gap-1">
             <h3 className="font-semibold text-lg">{name}</h3>
             {isOwner && (
-              <Crown className="h-4 w-4 text-amber-500" title="You created this group" />
+              <div title="You created this group">
+                <Crown className="h-4 w-4 text-amber-500" />
+              </div>
             )}
           </div>
           <span className="text-xs font-medium bg-pastel-blue px-2 py-1 rounded-full">
