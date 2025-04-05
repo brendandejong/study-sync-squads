@@ -6,6 +6,7 @@ import { BarChartIcon, Calendar, Edit } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { useToast } from '@/hooks/use-toast';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChartSectionProps {
   weeklyProgressData: { name: string; hours: number }[];
@@ -14,6 +15,7 @@ interface ChartSectionProps {
 
 const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) => {
   const { toast } = useToast();
+  const isMobile = useIsMobile();
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -44,12 +46,12 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={weeklyProgressData} 
-                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
+                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
               >
                 <XAxis dataKey="name" tick={{ fontSize: 8 }} />
                 <YAxis tick={{ fontSize: 8 }} />
                 <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={20} />
+                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={16} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
