@@ -44,12 +44,12 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={weeklyProgressData} 
-                margin={{ top: 5, right: 5, left: -15, bottom: 5 }}
+                margin={{ top: 5, right: 10, left: -20, bottom: 5 }}
               >
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
+                <XAxis dataKey="name" tick={{ fontSize: 8 }} />
+                <YAxis tick={{ fontSize: 8 }} />
                 <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" />
+                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={20} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
@@ -85,12 +85,17 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
                 data={studyTypeData}
                 cx="50%"
                 cy="50%"
-                outerRadius={60}
-                innerRadius={30}
+                outerRadius={50}
+                innerRadius={25}
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                label={({ name, percent }) => {
+                  // Truncate long labels and make font smaller
+                  const displayName = name.length > 8 ? name.substring(0, 7) + '...' : name;
+                  return `${displayName} ${(percent * 100).toFixed(0)}%`;
+                }}
                 labelLine={false}
+                style={{ fontSize: '8px' }}
               >
                 {studyTypeData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
