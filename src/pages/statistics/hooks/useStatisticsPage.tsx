@@ -36,7 +36,8 @@ export const useStatisticsPage = () => {
     totalHours: stats.totalHours,
     weeklyHours: stats.weeklyHours,
     streak: stats.streak,
-    preferredStudyType: stats.preferredStudyType
+    preferredStudyType: stats.preferredStudyType,
+    lastStudyDate: stats.lastStudyDate
   });
 
   // Demo data for charts

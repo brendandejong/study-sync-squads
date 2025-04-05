@@ -10,6 +10,7 @@ interface EditedStats {
   weeklyHours: number;
   streak: number;
   preferredStudyType: string;
+  lastStudyDate?: string | null;
 }
 
 interface EditStatsDialogProps {
@@ -64,6 +65,15 @@ const EditStatsDialog = ({
               min="0"
               value={editedStats.streak}
               onChange={(e) => setEditedStats({ ...editedStats, streak: parseInt(e.target.value) })}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="lastStudyDate">Last Study Date</Label>
+            <Input
+              id="lastStudyDate"
+              type="date"
+              value={editedStats.lastStudyDate || ''}
+              onChange={(e) => setEditedStats({ ...editedStats, lastStudyDate: e.target.value })}
             />
           </div>
           <div className="space-y-2">
