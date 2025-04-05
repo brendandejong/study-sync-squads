@@ -14,6 +14,7 @@ const StatisticsPage = () => {
     courses,
     studyTypeData,
     weeklyProgressData,
+    sessions,
     
     // Dialog states
     isGoalDialogOpen,
@@ -57,6 +58,7 @@ const StatisticsPage = () => {
           courses={courses}
           weeklyProgressData={weeklyProgressData}
           studyTypeData={studyTypeData}
+          sessions={sessions}
           onEditStats={() => setIsStatsDialogOpen(true)}
           onDeleteGoal={confirmDeleteGoal}
         />

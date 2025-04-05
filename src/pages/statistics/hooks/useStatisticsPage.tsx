@@ -7,7 +7,7 @@ import { useCourses } from '@/hooks/useCourses';
 // Hook to manage state and handlers for the Statistics page
 export const useStatisticsPage = () => {
   const { toast } = useToast();
-  const { goals, stats, addGoal, updateStats, logStudySession, deleteGoal } = useStats();
+  const { goals, stats, sessions, addGoal, updateStats, logStudySession, deleteGoal } = useStats();
   const { courses } = useCourses();
 
   // Dialog open states
@@ -154,6 +154,7 @@ export const useStatisticsPage = () => {
     courses,
     studyTypeData,
     weeklyProgressData,
+    sessions,
     
     // Dialog states
     isGoalDialogOpen,

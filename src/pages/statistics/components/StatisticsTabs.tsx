@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatsOverview from '@/components/statistics/StatsOverview';
 import ChartSection from '@/components/statistics/ChartSection';
 import GoalList from '@/components/statistics/GoalList';
-import { StudyGoal, StudyStats } from '@/hooks/useStats';
+import { StudyGoal, StudyStats, StudySession } from '@/hooks/useStats';
 
 interface StatisticsTabsProps {
   stats: StudyStats;
@@ -12,6 +12,7 @@ interface StatisticsTabsProps {
   courses: any[];
   weeklyProgressData: { name: string; hours: number }[];
   studyTypeData: { name: string; value: number; color: string }[];
+  sessions: StudySession[];
   onEditStats: () => void;
   onDeleteGoal: (goalId: string) => void;
 }
@@ -22,6 +23,7 @@ const StatisticsTabs = ({
   courses, 
   weeklyProgressData,
   studyTypeData,
+  sessions,
   onEditStats, 
   onDeleteGoal 
 }: StatisticsTabsProps) => {
@@ -47,6 +49,7 @@ const StatisticsTabs = ({
         <ChartSection 
           weeklyProgressData={weeklyProgressData}
           studyTypeData={studyTypeData}
+          sessions={sessions}
         />
       </TabsContent>
       
