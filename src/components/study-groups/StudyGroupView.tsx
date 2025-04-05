@@ -34,6 +34,13 @@ const StudyGroupView: React.FC<StudyGroupViewProps> = ({
   onCreateClick,
   currentUser
 }) => {
+  // Log extra debugging information
+  console.log('StudyGroupView rendering:', {
+    showMyGroups,
+    filteredGroupsCount: filteredGroups.length,
+    userGroupsCount
+  });
+
   return (
     <>
       <div className="mb-6">

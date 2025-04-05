@@ -27,10 +27,21 @@ export const useStudyGroupFilters = (
     currentUserId: currentUser?.id
   });
 
+  // First, get user groups
+  const userGroups = currentUser 
+    ? studyGroups.filter(group => 
+        group.members.some(member => member.id === currentUser.id)
+      )
+    : [];
+  
+  console.log('User is member of these groups:', userGroups.map(g => g.id));
+
   const filteredGroups = studyGroups.filter(group => {
     // For "My Groups", ONLY show groups where the user is a member
     if (showMyGroups) {
-      return currentUser ? group.members.some(member => member.id === currentUser.id) : false;
+      return currentUser ? 
+        group.members.some(member => member.id === currentUser.id) : 
+        false;
     }
     
     // For "All Groups" view, apply course and tag filters
@@ -74,6 +85,7 @@ export const useStudyGroupFilters = (
     setSelectedCourse,
     activeFilters,
     setActiveFilters,
-    filteredGroups
+    filteredGroups,
+    userGroupsCount: userGroups.length
   };
 };

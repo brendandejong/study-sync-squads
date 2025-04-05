@@ -50,7 +50,8 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
     setSelectedCourse, 
     activeFilters, 
     setActiveFilters,
-    filteredGroups
+    filteredGroups,
+    userGroupsCount
   } = useStudyGroupFilters(studyGroups, { showMyGroups });
   
   // Event handlers
@@ -62,7 +63,14 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
     }
   };
   
-  const userGroupsCount = userGroups.length;
+  // Debug logging
+  console.log('Index page rendering: ', {
+    totalGroups: studyGroups.length, 
+    filteredCount: filteredGroups.length,
+    userGroupsCount,
+    showMyGroups,
+    path: location.pathname
+  });
 
   return (
     <div className="min-h-screen bg-gradient-blue">
