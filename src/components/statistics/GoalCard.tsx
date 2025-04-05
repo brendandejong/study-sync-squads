@@ -40,8 +40,8 @@ const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps)
   
   return (
     <ContextMenu>
-      <ContextMenuTrigger>
-        <Card className={`card-gradient cursor-pointer hover:shadow-md transition-shadow ${isCompleted ? 'bg-green-50 border-green-200' : ''}`}>
+      <ContextMenuTrigger asChild>
+        <Card className={`card-gradient hover:shadow-md transition-shadow ${isCompleted ? 'bg-green-50 border-green-200' : ''}`}>
           <CardHeader className="pb-2">
             <div className="flex justify-between items-center">
               <CardTitle className="text-lg font-medium flex items-center gap-2">
