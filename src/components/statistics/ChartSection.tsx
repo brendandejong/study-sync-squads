@@ -2,8 +2,8 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChartIcon, Calendar, Edit } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChartIcon, Calendar, Edit, LineChart } from 'lucide-react';
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { useToast } from '@/hooks/use-toast';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -23,7 +23,7 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
         <CardHeader className="pb-0">
           <div className="flex justify-between items-center">
             <CardTitle className="text-sm md:text-base flex items-center">
-              <BarChartIcon className="mr-2 h-4 w-4 text-blue-500" />
+              <LineChart className="mr-2 h-4 w-4 text-blue-500" />
               Weekly Progress
             </CardTitle>
             <Button 
@@ -44,15 +44,34 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
         <CardContent className="pt-0 px-1 h-[calc(100%-70px)]">
           <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={weeklyProgressData} 
-                margin={{ top: 5, right: 10, left: -15, bottom: 5 }}
+              <RechartsLineChart
+                data={weeklyProgressData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
               >
-                <XAxis dataKey="name" tick={{ fontSize: 8 }} />
-                <YAxis tick={{ fontSize: 8 }} width={25} tickFormatter={(value) => value > 0 ? value : ''} />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 9 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                />
+                <YAxis 
+                  tick={{ fontSize: 9 }} 
+                  width={20} 
+                  tickFormatter={(value) => value > 0 ? value : ''} 
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                  domain={[0, 'dataMax + 0.5']}
+                />
                 <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={isMobile ? 16 : 14} />
-              </BarChart>
+                <Line 
+                  type="monotone" 
+                  dataKey="hours" 
+                  stroke="var(--color-hours, #93c5fd)" 
+                  strokeWidth={2}
+                  dot={{ stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, r: 3, fill: 'white' }}
+                  activeDot={{ r: 5, stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, fill: 'var(--color-hours, #93c5fd)' }}
+                />
+              </RechartsLineChart>
             </ResponsiveContainer>
           </ChartContainer>
         </CardContent>
