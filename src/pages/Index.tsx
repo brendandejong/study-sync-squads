@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { StudyGroup } from '@/types';
 import Header from '@/components/Header';
 import CreateGroupModal from '@/components/CreateGroupModal';
-import GroupDetails from '@/components/GroupDetails';
+import GroupDetails from '@/components/group-details/GroupDetails';
 import CalendarView from '@/components/calendar/CalendarView';
 import ChatAssistant from '@/components/chat/ChatAssistant';
 import { Button } from '@/components/ui/button';
