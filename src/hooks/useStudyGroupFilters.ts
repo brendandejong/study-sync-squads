@@ -29,36 +29,41 @@ export const useStudyGroupFilters = (
   console.log('User is member of these groups:', userGroups.map(g => g.id));
   console.log('Show My Groups flag is set to:', showMyGroups);
 
-  // Return different groups based on showMyGroups value
+  // Determine which groups to display based on filters
   const filteredGroups = showMyGroups 
     ? userGroups // When "My Groups" is selected, ONLY show user's groups
     : studyGroups.filter(group => {
         // For "All Groups" view, apply course and tag filters
+        let shouldInclude = true;
         
-        // First check course filter
+        // Apply course filter if one is selected
         if (selectedCourse && group.course.id !== selectedCourse.id) {
-          return false;
+          shouldInclude = false;
         }
         
-        // Then check tag filters
-        if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
-          return false;
+        // Apply tag filters if any are selected
+        if (shouldInclude && activeFilters.length > 0 && 
+            !group.tags.some(tag => activeFilters.includes(tag))) {
+          shouldInclude = false;
         }
         
-        // For public groups, they should be visible to everyone
-        if (group.isPublic) {
-          return true;
+        // For private groups, check visibility rules
+        if (shouldInclude && !group.isPublic) {
+          // Private groups are only visible if:
+          // 1. User created the group
+          // 2. User is a member
+          // 3. User was invited
+          if (!currentUser) {
+            shouldInclude = false;
+          } else {
+            shouldInclude = 
+              group.createdBy === currentUser.id || 
+              group.members.some(m => m.id === currentUser.id) ||
+              (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
+          }
         }
         
-        // For private groups, user must be logged in and have access
-        if (!currentUser) {
-          return false; // No access to private groups if not logged in
-        }
-        
-        // User can see private groups if they created it, are a member, or were invited
-        return group.createdBy === currentUser.id || 
-               group.members.some(m => m.id === currentUser.id) ||
-               (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
+        return shouldInclude;
       });
 
   console.log('Filtered groups count:', filteredGroups.length);

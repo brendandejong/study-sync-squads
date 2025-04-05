@@ -82,7 +82,11 @@ const StudyGroupCard = ({ group, onClick, isOwner = false, currentUser }: StudyG
           <div className="flex items-center">
             <div className="flex -space-x-2 mr-2">
               {members.slice(0, 3).map((member) => (
-                <UserAvatar key={member.id} user={member} size="sm" />
+                <UserAvatar 
+                  key={member.id} 
+                  user={member}
+                  size="sm" 
+                />
               ))}
               {members.length > 3 && (
                 <div className="h-8 w-8 rounded-full bg-pastel-lavender flex items-center justify-center text-xs text-indigo-600">

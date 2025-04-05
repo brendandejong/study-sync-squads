@@ -14,7 +14,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Calendar, Clock, MapPin, MessageSquare, Users, Send, Lock, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { currentUser } from '@/data/mockData';
+import { useAuth } from '@/context/AuthContext';
 import { useToast } from '@/components/ui/use-toast';
 import { Badge } from './ui/badge';
 
@@ -38,16 +38,17 @@ const GroupDetails = ({
   const [newMessage, setNewMessage] = useState('');
   const [messages, setMessages] = useState<Message[]>(initialMessages);
   const { toast } = useToast();
+  const { currentUser } = useAuth();
   
   if (!group) return null;
   
-  const isCurrentUserMember = group.members.some(member => member.id === currentUser.id);
-  const isCurrentUserOwner = group.createdBy === currentUser.id;
+  const isCurrentUserMember = group.members.some(member => member.id === currentUser?.id);
+  const isCurrentUserOwner = group.createdBy === currentUser?.id;
   const isFull = group.members.length >= group.maxMembers;
   
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !isCurrentUserMember) return;
+    if (!newMessage.trim() || !isCurrentUserMember || !currentUser) return;
     
     const newMessageObj: Message = {
       id: `msg-${Date.now()}`,
@@ -144,8 +145,13 @@ const GroupDetails = ({
                 <div className="flex flex-wrap gap-2">
                   {group.members.map((member) => (
                     <div key={member.id} className="flex flex-col items-center">
-                      <UserAvatar user={member} size="sm" />
-                      <span className="text-xs mt-1">{member.name.split(' ')[0]}</span>
+                      <UserAvatar 
+                        user={member} 
+                        size="sm" 
+                      />
+                      <span className="text-xs mt-1">
+                        {member.name.split(' ')[0]}
+                      </span>
                     </div>
                   ))}
                 </div>

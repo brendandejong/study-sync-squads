@@ -18,15 +18,13 @@ const UserAvatar = ({ user: initialUser, size = 'md', showDropdown = false }: Us
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [displayUser, setDisplayUser] = useState<User>(initialUser);
   
-  // Update local state when currentUser from context changes
+  // Update local state when initialUser changes
   useEffect(() => {
-    // Always use the currentUser from context if available, as it's the source of truth
-    if (currentUser) {
+    // Only update from currentUser if this avatar is showing the current user
+    if (currentUser && initialUser.id === currentUser.id) {
       setDisplayUser(currentUser);
-      console.log("UserAvatar: Updated with currentUser from context:", currentUser);
-    } else if (initialUser) {
+    } else {
       setDisplayUser(initialUser);
-      console.log("UserAvatar: Using initialUser:", initialUser);
     }
   }, [currentUser, initialUser]);
   
