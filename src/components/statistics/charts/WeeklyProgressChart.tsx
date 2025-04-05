@@ -37,39 +37,46 @@ const WeeklyProgressChart = ({ data }: WeeklyProgressChartProps) => {
         </div>
         <CardDescription className="text-xs md:text-sm">Hours studied per day this week</CardDescription>
       </CardHeader>
-      <CardContent className="pt-0 px-1 h-[calc(100%-70px)]">
-        <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <RechartsLineChart
-              data={data}
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
-            >
-              <XAxis 
-                dataKey="name" 
-                tick={{ fontSize: 9 }}
-                axisLine={{ stroke: '#e5e7eb' }}
-                tickLine={{ stroke: '#e5e7eb' }}
-              />
-              <YAxis 
-                tick={{ fontSize: 9 }} 
-                width={20} 
-                tickFormatter={(value) => value > 0 ? value : ''} 
-                axisLine={{ stroke: '#e5e7eb' }}
-                tickLine={{ stroke: '#e5e7eb' }}
-                domain={[0, 'dataMax + 0.5']}
-              />
-              <Tooltip content={<ChartTooltipContent />} />
-              <Line 
-                type="monotone" 
-                dataKey="hours" 
-                stroke="var(--color-hours, #93c5fd)" 
-                strokeWidth={2}
-                dot={{ stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, r: 3, fill: 'white' }}
-                activeDot={{ r: 5, stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, fill: 'var(--color-hours, #93c5fd)' }}
-              />
-            </RechartsLineChart>
-          </ResponsiveContainer>
-        </ChartContainer>
+      <CardContent className="pt-0 h-[calc(100%-70px)]">
+        <div className="w-full h-full">
+          <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <RechartsLineChart
+                data={data}
+                margin={{ top: 15, right: 15, left: 0, bottom: 5 }}
+              >
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fontSize: 9 }}
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                  dy={5}
+                />
+                <YAxis 
+                  tick={{ fontSize: 9 }} 
+                  width={25}
+                  tickFormatter={(value) => value > 0 ? value : ''} 
+                  axisLine={{ stroke: '#e5e7eb' }}
+                  tickLine={{ stroke: '#e5e7eb' }}
+                  domain={[0, 'dataMax + 0.5']}
+                  dx={-5}
+                />
+                <Tooltip 
+                  content={<ChartTooltipContent />}
+                  wrapperStyle={{ zIndex: 100 }}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="hours" 
+                  stroke="var(--color-hours, #93c5fd)" 
+                  strokeWidth={2}
+                  dot={{ stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, r: 2, fill: 'white' }}
+                  activeDot={{ r: 4, stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, fill: 'var(--color-hours, #93c5fd)' }}
+                />
+              </RechartsLineChart>
+            </ResponsiveContainer>
+          </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   );
