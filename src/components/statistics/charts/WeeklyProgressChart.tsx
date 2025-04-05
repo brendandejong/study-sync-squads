@@ -37,41 +37,43 @@ const WeeklyProgressChart = ({ data }: WeeklyProgressChartProps) => {
         </div>
         <CardDescription className="text-xs md:text-sm">Hours studied per day this week</CardDescription>
       </CardHeader>
-      <CardContent className="pt-0 h-[calc(100%-70px)]">
-        <div className="w-full h-full">
+      <CardContent className="pt-0 pb-2 px-1 h-[calc(100%-70px)]">
+        <div className="w-full h-full max-h-full">
           <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height="99%">
               <RechartsLineChart
                 data={data}
-                margin={{ top: 15, right: 15, left: 0, bottom: 5 }}
+                margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
               >
                 <XAxis 
                   dataKey="name" 
-                  tick={{ fontSize: 9 }}
+                  tick={{ fontSize: 8 }}
                   axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
-                  dy={5}
+                  tickLine={false}
+                  dy={3}
                 />
                 <YAxis 
-                  tick={{ fontSize: 9 }} 
-                  width={25}
+                  tick={{ fontSize: 8 }} 
+                  width={20}
                   tickFormatter={(value) => value > 0 ? value : ''} 
                   axisLine={{ stroke: '#e5e7eb' }}
-                  tickLine={{ stroke: '#e5e7eb' }}
+                  tickLine={false}
                   domain={[0, 'dataMax + 0.5']}
-                  dx={-5}
+                  dx={-3}
                 />
                 <Tooltip 
                   content={<ChartTooltipContent />}
                   wrapperStyle={{ zIndex: 100 }}
+                  isAnimationActive={false}
                 />
                 <Line 
                   type="monotone" 
                   dataKey="hours" 
                   stroke="var(--color-hours, #93c5fd)" 
-                  strokeWidth={2}
-                  dot={{ stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, r: 2, fill: 'white' }}
-                  activeDot={{ r: 4, stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, fill: 'var(--color-hours, #93c5fd)' }}
+                  strokeWidth={1.5}
+                  dot={{ stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, r: 1.5, fill: 'white' }}
+                  activeDot={{ r: 3, stroke: 'var(--color-hours, #93c5fd)', strokeWidth: 1, fill: 'var(--color-hours, #93c5fd)' }}
+                  isAnimationActive={false}
                 />
               </RechartsLineChart>
             </ResponsiveContainer>
