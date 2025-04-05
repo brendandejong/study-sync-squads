@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Trash, CheckCircle2 } from 'lucide-react';
-import { StudyGoal } from '@/hooks/useStats';
+import { StudyGoal } from '@/hooks/statistics/types';
 import {
   ContextMenu,
   ContextMenuContent,

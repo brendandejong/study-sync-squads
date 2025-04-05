@@ -1,7 +1,7 @@
 
 import React from 'react';
 import GoalCard from './GoalCard';
-import { StudyGoal } from '@/hooks/useStats';
+import { StudyGoal } from '@/hooks/statistics/types';
 
 interface GoalListProps {
   goals: StudyGoal[];

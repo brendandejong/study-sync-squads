@@ -1,10 +1,9 @@
-
 import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import StatsOverview from '@/components/statistics/StatsOverview';
 import ChartSection from '@/components/statistics/ChartSection';
 import GoalList from '@/components/statistics/GoalList';
-import { StudyGoal, StudyStats, StudySession } from '@/hooks/useStats';
+import { StudyGoal, StudyStats, StudySession } from '@/hooks/statistics/types';
 
 interface StatisticsTabsProps {
   stats: StudyStats;
