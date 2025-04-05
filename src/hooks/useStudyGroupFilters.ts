@@ -19,48 +19,36 @@ export const useStudyGroupFilters = (
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>(initialOptions.activeFilters || []);
 
   const filteredGroups = studyGroups.filter(group => {
-    // First check course and tag filters as they apply to all groups
+    // First check course filter (applies to all groups)
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
     
+    // Then check tag filters (applies to all groups)
     if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
       return false;
     }
     
-    // PUBLIC GROUPS ARE ALWAYS VISIBLE except in "My Groups" view
+    // In "My Groups" view, only show groups where the user is a member
+    if (showMyGroups) {
+      return currentUser ? group.members.some(m => m.id === currentUser.id) : false;
+    }
+    
+    // For the "All Groups" view:
+    // 1. All public groups should be visible at this point (after course and tag filtering)
     if (group.isPublic) {
-      // In "My Groups" view, only show public groups where user is a member
-      if (showMyGroups) {
-        return currentUser ? group.members.some(m => m.id === currentUser.id) : false;
-      }
-      
-      // For non-My Groups view, all public groups that pass filters are visible
       return true;
     }
     
-    // For private groups
-    // User must be logged in to see any private group
+    // 2. For private groups, user must be logged in and have access
     if (!currentUser) {
-      return false;
+      return false; // No access to private groups if not logged in
     }
     
-    // Check if user has access to this private group
-    const hasAccess = group.createdBy === currentUser.id || 
-                      group.members.some(m => m.id === currentUser.id) ||
-                      (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
-                     
-    if (!hasAccess) {
-      return false;
-    }
-    
-    // For "My Groups" view, only show private groups where user is a member
-    if (showMyGroups) {
-      return group.members.some(m => m.id === currentUser.id);
-    }
-    
-    // If we get here, this is a private group the user has access to
-    return true;
+    // User can see private groups if they created it, are a member, or were invited
+    return group.createdBy === currentUser.id || 
+           group.members.some(m => m.id === currentUser.id) ||
+           (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
   });
 
   return {

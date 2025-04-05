@@ -15,28 +15,32 @@ export const useStudyGroups = () => {
 
   // Initialize with study groups from localStorage or default ones
   useEffect(() => {
-    // Transform the initial groups to ensure they have the isPublic property
-    const transformedGroups = initialGroups.map(group => ({
-      ...group,
-      isPublic: true, // Make all existing groups public by default
-    }));
+    // Log the initial groups from mockData to debug
+    console.log('Initial groups from mockData:', initialGroups);
+    
+    // Clear localStorage for testing to ensure we load the default groups
+    // This is temporary and should be removed in production
+    localStorage.removeItem(SHARED_STUDY_GROUPS_KEY);
     
     // Check if there are stored groups in localStorage
     const storedGroups = localStorage.getItem(SHARED_STUDY_GROUPS_KEY);
     if (storedGroups) {
       try {
         const parsedGroups = JSON.parse(storedGroups);
+        console.log('Loaded groups from localStorage:', parsedGroups);
         setStudyGroups(parsedGroups);
       } catch (error) {
         console.error('Error parsing stored groups:', error);
-        setStudyGroups(transformedGroups);
-        // Initialize with transformed groups if there's an error
-        localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(transformedGroups));
+        console.log('Falling back to initial groups');
+        setStudyGroups(initialGroups);
+        // Initialize with initial groups if there's an error
+        localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(initialGroups));
       }
     } else {
-      setStudyGroups(transformedGroups);
-      // Initialize with transformed groups if there's nothing stored
-      localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(transformedGroups));
+      console.log('No stored groups found, using initial groups');
+      setStudyGroups(initialGroups);
+      // Initialize with initial groups if there's nothing stored
+      localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(initialGroups));
     }
   }, []);
   

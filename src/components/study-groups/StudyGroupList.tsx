@@ -28,6 +28,9 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   // Use provided currentUser or fallback to authUser
   const user = currentUser || authUser;
   
+  // Add console logs to debug what groups are being passed to the component
+  console.log('StudyGroupList rendering with groups:', studyGroups);
+  
   return (
     <div>
       {studyGroups.length > 0 ? (
