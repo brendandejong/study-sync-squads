@@ -14,9 +14,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import CourseSelector from './CourseSelector';
 import AvailabilitySelector from './AvailabilitySelector';
-import { currentUser } from '@/data/mockData';
+import { useAuth } from '@/context/AuthContext';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ interface CreateGroupModalProps {
 }
 
 const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalProps) => {
+  const { currentUser } = useAuth();
   const [name, setName] = useState('');
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [description, setDescription] = useState('');
@@ -32,6 +34,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
   const [maxMembers, setMaxMembers] = useState(5);
   const [selectedTags, setSelectedTags] = useState<StudyTag[]>([]);
   const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
+  const [isPublic, setIsPublic] = useState(true);
 
   const availableTags: { value: StudyTag; label: string }[] = [
     { value: 'quiet', label: 'Quiet Session' },
@@ -58,7 +61,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
   };
 
   const handleSubmit = () => {
-    if (!selectedCourse) return;
+    if (!selectedCourse || !currentUser) return;
     
     const newGroup = {
       name,
@@ -70,6 +73,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
       timeSlots,
       location,
       createdBy: currentUser.id,
+      isPublic,
     };
     
     onCreateGroup(newGroup);
@@ -85,6 +89,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
     setMaxMembers(5);
     setSelectedTags([]);
     setTimeSlots([]);
+    setIsPublic(true);
   };
 
   return (
@@ -172,6 +177,22 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
                 </div>
               ))}
             </div>
+          </div>
+          
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="isPublic">Make this group public</Label>
+              <Switch
+                id="isPublic"
+                checked={isPublic}
+                onCheckedChange={setIsPublic}
+              />
+            </div>
+            <p className="text-sm text-gray-500">
+              {isPublic 
+                ? "This group will be visible to all users and anyone can request to join." 
+                : "This group will only be visible to users you invite directly."}
+            </p>
           </div>
           
           <AvailabilitySelector

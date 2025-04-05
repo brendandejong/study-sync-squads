@@ -3,14 +3,16 @@ import { StudyGroup, StudyTag } from '@/types';
 import { formatTime } from '@/utils/helpers';
 import UserAvatar from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
-import { Calendar, Users } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Calendar, Users, Crown } from 'lucide-react';
 
 interface StudyGroupCardProps {
   group: StudyGroup;
   onClick: (groupId: string) => void;
+  isOwner?: boolean;
 }
 
-const StudyGroupCard = ({ group, onClick }: StudyGroupCardProps) => {
+const StudyGroupCard = ({ group, onClick, isOwner = false }: StudyGroupCardProps) => {
   const { id, name, course, description, tags, members, maxMembers, timeSlots, location } = group;
   
   return (
@@ -21,7 +23,12 @@ const StudyGroupCard = ({ group, onClick }: StudyGroupCardProps) => {
       <div className={`h-2 subject-${course.subject}`} />
       <div className="p-4">
         <div className="flex justify-between items-start mb-2">
-          <h3 className="font-semibold text-lg">{name}</h3>
+          <div className="flex items-center gap-1">
+            <h3 className="font-semibold text-lg">{name}</h3>
+            {isOwner && (
+              <Crown className="h-4 w-4 text-amber-500" />
+            )}
+          </div>
           <span className="text-xs font-medium bg-pastel-blue px-2 py-1 rounded-full">
             {course.code}
           </span>

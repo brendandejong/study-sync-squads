@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Filter, PlusCircle, Search } from 'lucide-react';
 import StudyGroupCard from '@/components/StudyGroupCard';
-import { currentUser } from '@/data/mockData';
+import { useAuth } from '@/context/AuthContext';
 
 interface StudyGroupListProps {
   studyGroups: StudyGroup[];
@@ -23,6 +23,7 @@ const StudyGroupList = ({
   activeFilters
 }: StudyGroupListProps) => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { currentUser } = useAuth();
 
   const filteredGroups = studyGroups.filter(group => {
     if (searchTerm && !group.name.toLowerCase().includes(searchTerm.toLowerCase()) && 
@@ -51,6 +52,7 @@ const StudyGroupList = ({
               key={group.id}
               group={group}
               onClick={onGroupClick}
+              isOwner={currentUser?.id === group.createdBy}
             />
           ))}
         </div>

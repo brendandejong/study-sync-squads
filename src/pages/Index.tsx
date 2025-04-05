@@ -10,7 +10,7 @@ import CalendarView from '@/components/calendar/CalendarView';
 import ChatAssistant from '@/components/chat/ChatAssistant';
 import { Button } from '@/components/ui/button';
 import { Plus, Calendar } from 'lucide-react';
-import { studyGroups as initialGroups, messages, currentUser } from '@/data/mockData';
+import { studyGroups as initialGroups, messages } from '@/data/mockData';
 import { useToast } from '@/components/ui/use-toast';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useLocation } from 'react-router-dom';
@@ -29,11 +29,41 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<StudyGroup | null>(null);
   const [isGroupDetailsOpen, setIsGroupDetailsOpen] = useState(false);
-  const [studyGroups, setStudyGroups] = useState<StudyGroup[]>(initialGroups);
+  const [studyGroups, setStudyGroups] = useState<StudyGroup[]>([]);
   
   const [showMyGroups, setShowMyGroups] = useState<boolean>(myGroupsOnly);
   
   const location = useLocation();
+  
+  // Initialize with some groups that have isPublic set
+  useEffect(() => {
+    // Transform the initial groups to ensure they have the isPublic property
+    const transformedGroups = initialGroups.map(group => ({
+      ...group,
+      isPublic: true, // Make all existing groups public by default
+    }));
+    
+    // Check if there are stored groups in localStorage
+    const storedGroups = localStorage.getItem('studyGroups');
+    if (storedGroups) {
+      try {
+        const parsedGroups = JSON.parse(storedGroups);
+        setStudyGroups(parsedGroups);
+      } catch (error) {
+        console.error('Error parsing stored groups:', error);
+        setStudyGroups(transformedGroups);
+      }
+    } else {
+      setStudyGroups(transformedGroups);
+    }
+  }, []);
+  
+  // Save groups to localStorage whenever they change
+  useEffect(() => {
+    if (studyGroups.length > 0) {
+      localStorage.setItem('studyGroups', JSON.stringify(studyGroups));
+    }
+  }, [studyGroups]);
   
   useEffect(() => {
     setShowMyGroups(location.pathname === '/my-groups');
@@ -54,7 +84,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const handleCreateGroup = (newGroup: Omit<StudyGroup, 'id' | 'createdAt'>) => {
     const createdGroup: StudyGroup = {
       ...newGroup,
-      id: `group-${studyGroups.length + 1}`,
+      id: `group-${Date.now()}`,
       createdAt: new Date().toISOString(),
     };
     
@@ -110,6 +140,11 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const userGroupsCount = userGroups.length;
 
   const filteredGroups = studyGroups.filter(group => {
+    // Only show public groups unless it's the user's own group
+    if (!group.isPublic && !(currentUser && group.createdBy === currentUser.id)) {
+      return false;
+    }
+    
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }

@@ -40,6 +40,7 @@ export interface StudyGroup {
   location: string;
   createdBy: string;
   createdAt: string;
+  isPublic: boolean;
 }
 
 export interface Message {
