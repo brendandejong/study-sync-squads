@@ -22,6 +22,22 @@ interface GoalCardProps {
 const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps) => {
   const isCompleted = goal.completedHours >= goal.targetHours;
   
+  // Prevent event propagation to avoid triggering parent events
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDelete(goal.id);
+  };
+  
+  const handleCompleteClick = () => {
+    if (!isCompleted) {
+      onComplete(goal.id);
+    }
+  };
+  
+  const handleProgressClick = (hours: number) => {
+    onMarkProgress(goal.id, hours);
+  };
+  
   return (
     <ContextMenu>
       <ContextMenuTrigger>
@@ -35,10 +51,7 @@ const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps)
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onDelete(goal.id);
-                }}
+                onClick={handleDeleteClick}
                 className="text-red-500 hover:text-red-700 hover:bg-red-50"
               >
                 <Trash className="h-4 w-4" />
@@ -64,7 +77,7 @@ const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps)
       </ContextMenuTrigger>
       <ContextMenuContent className="w-64">
         <ContextMenuItem
-          onClick={() => onComplete(goal.id)}
+          onClick={handleCompleteClick}
           disabled={isCompleted}
           className={isCompleted ? 'text-gray-400' : 'text-green-600'}
         >
@@ -72,11 +85,11 @@ const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps)
           {isCompleted ? 'Already completed' : 'Mark as completed'}
         </ContextMenuItem>
         
-        <ContextMenuItem onClick={() => onMarkProgress(goal.id, 1)}>
+        <ContextMenuItem onClick={() => handleProgressClick(1)}>
           Add 1 hour of progress
         </ContextMenuItem>
         
-        <ContextMenuItem onClick={() => onMarkProgress(goal.id, 2)}>
+        <ContextMenuItem onClick={() => handleProgressClick(2)}>
           Add 2 hours of progress
         </ContextMenuItem>
       </ContextMenuContent>

@@ -1,8 +1,11 @@
+
 import { useToast } from '@/hooks/use-toast';
 import { StudyStats } from '@/hooks/statistics/types';
+import { StudyGoal } from '@/hooks/statistics/types';
 
 export const useStatisticsHandlers = (
   stats: StudyStats,
+  goals: StudyGoal[], // Add goals parameter
   addGoal: (goal: any) => void,
   logStudySession: (session: any) => void,
   updateStats: (stats: StudyStats) => void,
@@ -114,15 +117,29 @@ export const useStatisticsHandlers = (
   };
 
   const handleCompleteGoal = (goalId: string) => {
-    // Fix: Don't try to access stats.goals which doesn't exist on StudyStats type
-    // Instead, we'll need to receive goals as a separate parameter or get goals from elsewhere
-    // For now, we'll just use the goalId directly without checking against the goals array
-    updateGoalProgress(goalId, 100); // Set to a large value to ensure it's completed
+    // Find the goal in the goals array
+    const goal = goals.find(g => g.id === goalId);
     
-    toast({
-      title: "Goal completed",
-      description: "Congratulations! Your goal has been marked as completed."
-    });
+    if (goal) {
+      // Calculate remaining hours to complete
+      const remainingHours = Math.max(0, goal.targetHours - goal.completedHours);
+      
+      // Update the goal progress to mark it as complete
+      updateGoalProgress(goalId, remainingHours);
+      
+      toast({
+        title: "Goal completed",
+        description: `Congratulations! "${goal.title}" has been marked as completed.`
+      });
+    } else {
+      // Fallback in case goal is not found
+      updateGoalProgress(goalId, 100);
+      
+      toast({
+        title: "Goal completed",
+        description: "Congratulations! Your goal has been marked as completed."
+      });
+    }
   };
   
   const handleUpdateGoalProgress = (goalId: string, hours: number) => {

@@ -19,6 +19,7 @@ export const useStatisticsPage = () => {
   // Get event handlers
   const handlers = useStatisticsHandlers(
     stats,
+    goals, // Pass goals to the handlers
     addGoal,
     logStudySession,
     updateStats,
