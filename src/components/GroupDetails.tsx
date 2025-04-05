@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { StudyGroup, Message } from '@/types';
+import { StudyGroup, Message, User } from '@/types';
 import { formatTime, formatDate } from '@/utils/helpers';
 import UserAvatar from './UserAvatar';
 import { Button } from '@/components/ui/button';
@@ -12,10 +12,11 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calendar, Clock, MapPin, MessageSquare, Users, Send } from 'lucide-react';
+import { Calendar, Clock, MapPin, MessageSquare, Users, Send, Lock, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { currentUser } from '@/data/mockData';
 import { useToast } from '@/components/ui/use-toast';
+import { Badge } from './ui/badge';
 
 interface GroupDetailsProps {
   group: StudyGroup | null;
@@ -41,6 +42,7 @@ const GroupDetails = ({
   if (!group) return null;
   
   const isCurrentUserMember = group.members.some(member => member.id === currentUser.id);
+  const isCurrentUserOwner = group.createdBy === currentUser.id;
   const isFull = group.members.length >= group.maxMembers;
   
   const handleSendMessage = (e: React.FormEvent) => {
@@ -71,9 +73,15 @@ const GroupDetails = ({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[700px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl flex items-center">
+          <DialogTitle className="text-xl flex items-center gap-2">
             <div className={`h-4 w-4 rounded-full mr-2 subject-${group.course.subject}`} />
             {group.name}
+            {!group.isPublic && (
+              <Badge variant="outline" className="ml-2 flex items-center gap-1">
+                <Lock className="h-3 w-3" />
+                Private
+              </Badge>
+            )}
           </DialogTitle>
           <DialogDescription>
             {group.course.code} - {group.course.name}
@@ -143,6 +151,24 @@ const GroupDetails = ({
                 </div>
               </div>
             </div>
+            
+            {!group.isPublic && isCurrentUserOwner && (
+              <div className="bg-blue-50 p-4 rounded-lg mt-4">
+                <h3 className="font-medium flex items-center mb-2">
+                  <UserPlus className="h-4 w-4 mr-2" />
+                  Invite People
+                </h3>
+                <p className="text-sm text-gray-600 mb-2">
+                  This is a private group. Only people you invite can see and join it.
+                </p>
+                <div className="flex gap-2">
+                  <Button variant="outline" size="sm" className="bg-white">
+                    <UserPlus className="h-4 w-4 mr-1" />
+                    Invite Members
+                  </Button>
+                </div>
+              </div>
+            )}
             
             <div className="pt-4 flex justify-end">
               {isCurrentUserMember ? (

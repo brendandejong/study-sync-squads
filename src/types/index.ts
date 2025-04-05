@@ -41,6 +41,7 @@ export interface StudyGroup {
   createdBy: string;
   createdAt: string;
   isPublic: boolean;
+  invitedUsers?: string[]; // Array of user IDs who are invited to see the private group
 }
 
 export interface Message {

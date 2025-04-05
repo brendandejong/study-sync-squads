@@ -140,19 +140,32 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const userGroupsCount = userGroups.length;
 
   const filteredGroups = studyGroups.filter(group => {
-    // Only show public groups unless it's the user's own group
-    if (!group.isPublic && !(currentUser && group.createdBy === currentUser.id)) {
-      return false;
+    // Current user's created groups always visible
+    if (currentUser && group.createdBy === currentUser.id) {
+      return true;
     }
     
+    // Filter by privacy settings
+    if (!group.isPublic) {
+      // For private groups, check if the current user is invited
+      const isInvited = currentUser && group.invitedUsers?.includes(currentUser.id);
+      // For private groups, only show if the user is a member or invited
+      if (!isInvited && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
+        return false;
+      }
+    }
+    
+    // Apply course filter
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
     
+    // Apply tag filters
     if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
       return false;
     }
     
+    // Filter for My Groups tab
     if (showMyGroups && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
       return false;
     }
@@ -215,6 +228,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
                   onCreateClick={() => setIsCreateModalOpen(true)}
                   selectedCourse={selectedCourse?.id || null}
                   activeFilters={activeFilters}
+                  currentUser={currentUser}
                 />
               </div>
             </div>

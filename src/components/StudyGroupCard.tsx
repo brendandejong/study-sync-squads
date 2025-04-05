@@ -1,19 +1,23 @@
 
-import { StudyGroup, StudyTag } from '@/types';
+import { StudyGroup, StudyTag, User } from '@/types';
 import { formatTime } from '@/utils/helpers';
 import UserAvatar from '@/components/UserAvatar';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Users, Crown } from 'lucide-react';
+import { Calendar, Users, Crown, Lock } from 'lucide-react';
 
 interface StudyGroupCardProps {
   group: StudyGroup;
   onClick: (groupId: string) => void;
   isOwner?: boolean;
+  currentUser?: User | null;
 }
 
-const StudyGroupCard = ({ group, onClick, isOwner = false }: StudyGroupCardProps) => {
-  const { id, name, course, description, tags, members, maxMembers, timeSlots, location } = group;
+const StudyGroupCard = ({ group, onClick, isOwner = false, currentUser }: StudyGroupCardProps) => {
+  const { id, name, course, description, tags, members, maxMembers, timeSlots, location, isPublic } = group;
+  
+  const isInvited = currentUser && group.invitedUsers?.includes(currentUser.id);
+  const showPrivateBadge = !isPublic && (isOwner || isInvited || members.some(m => m.id === currentUser?.id));
   
   return (
     <div 
@@ -27,6 +31,9 @@ const StudyGroupCard = ({ group, onClick, isOwner = false }: StudyGroupCardProps
             <h3 className="font-semibold text-lg">{name}</h3>
             {isOwner && (
               <Crown className="h-4 w-4 text-amber-500" />
+            )}
+            {showPrivateBadge && (
+              <Lock className="h-4 w-4 text-gray-500" />
             )}
           </div>
           <span className="text-xs font-medium bg-pastel-blue px-2 py-1 rounded-full">
@@ -45,6 +52,13 @@ const StudyGroupCard = ({ group, onClick, isOwner = false }: StudyGroupCardProps
               {tag.charAt(0).toUpperCase() + tag.slice(1)}
             </span>
           ))}
+          
+          {!isPublic && (
+            <Badge variant="outline" className="flex items-center gap-1">
+              <Lock className="h-3 w-3" />
+              Private
+            </Badge>
+          )}
         </div>
         
         <div className="flex items-center gap-2 text-sm text-gray-600 mb-3">
