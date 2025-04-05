@@ -10,8 +10,8 @@ interface GroupDetailsTabsProps {
   isCurrentUserMember: boolean;
   isCurrentUserOwner: boolean;
   currentUser: User | null;
-  onJoinGroup: (groupId: string) => void;
-  onLeaveGroup: (groupId: string) => void;
+  onJoinGroup: () => void;
+  onLeaveGroup: () => void;
 }
 
 const GroupDetailsTabs = ({

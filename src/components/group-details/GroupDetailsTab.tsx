@@ -11,8 +11,8 @@ interface GroupDetailsTabProps {
   isCurrentUserMember: boolean;
   isCurrentUserOwner: boolean;
   isFull: boolean;
-  onJoinGroup: (groupId: string) => void;
-  onLeaveGroup: (groupId: string) => void;
+  onJoinGroup: () => void;
+  onLeaveGroup: () => void;
 }
 
 const GroupDetailsTab = ({
@@ -110,14 +110,14 @@ const GroupDetailsTab = ({
           <Button
             variant="outline"
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
-            onClick={() => onLeaveGroup(group.id)}
+            onClick={onLeaveGroup}
           >
             Leave Group
           </Button>
         ) : (
           <Button
             disabled={isFull}
-            onClick={() => onJoinGroup(group.id)}
+            onClick={onJoinGroup}
           >
             {isFull ? 'Group is Full' : 'Join Group'}
           </Button>

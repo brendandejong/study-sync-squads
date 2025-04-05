@@ -99,13 +99,17 @@ export const useStudyGroups = () => {
     return createdGroup;
   };
   
-  // Join a study group
+  // Join a study group - Fixed to only join the specific group
   const joinGroup = (groupId: string) => {
     if (!currentUser) return;
     
-    setStudyGroups(
-      studyGroups.map(group => {
+    console.log(`Attempting to join group: ${groupId}`);
+    
+    setStudyGroups(prevGroups => 
+      prevGroups.map(group => {
+        // Only modify the specific group requested to join
         if (group.id === groupId && !group.members.some(m => m.id === currentUser.id)) {
+          console.log(`Joining group: ${group.name} (${group.id})`);
           return {
             ...group,
             members: [...group.members, currentUser],
@@ -125,9 +129,13 @@ export const useStudyGroups = () => {
   const leaveGroup = (groupId: string) => {
     if (!currentUser) return;
     
-    setStudyGroups(
-      studyGroups.map(group => {
+    console.log(`Attempting to leave group: ${groupId}`);
+    
+    setStudyGroups(prevGroups =>
+      prevGroups.map(group => {
+        // Only modify the specific group requested to leave
         if (group.id === groupId) {
+          console.log(`Leaving group: ${group.name} (${group.id})`);
           return {
             ...group,
             members: group.members.filter(m => m.id !== currentUser.id),
