@@ -6,7 +6,7 @@ import { calculateStreak } from './streakUtils';
 import { isToday, parseISO } from 'date-fns';
 import { StudyGoal, StudySession, StudyStats } from './types';
 
-// Export types with the 'type' keyword to fix the isolatedModules error
+// Export types with the 'export type' keyword to fix the isolatedModules error
 export type { StudyGoal, StudySession, StudyStats } from './types';
 
 export const useStats = () => {
