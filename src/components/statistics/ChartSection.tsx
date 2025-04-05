@@ -41,17 +41,17 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
           </div>
           <CardDescription className="text-xs md:text-sm">Hours studied per day this week</CardDescription>
         </CardHeader>
-        <CardContent className="pt-2 px-2 h-[calc(100%-70px)]">
+        <CardContent className="pt-0 px-1 h-[calc(100%-70px)]">
           <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
                 data={weeklyProgressData} 
-                margin={{ top: 5, right: 20, left: 0, bottom: 5 }}
+                margin={{ top: 5, right: 10, left: -15, bottom: 5 }}
               >
                 <XAxis dataKey="name" tick={{ fontSize: 8 }} />
-                <YAxis tick={{ fontSize: 8 }} />
+                <YAxis tick={{ fontSize: 8 }} width={25} tickFormatter={(value) => value > 0 ? value : ''} />
                 <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={16} />
+                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" barSize={isMobile ? 16 : 14} />
               </BarChart>
             </ResponsiveContainer>
           </ChartContainer>
