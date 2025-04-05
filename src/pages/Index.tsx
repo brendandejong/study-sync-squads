@@ -21,6 +21,9 @@ interface IndexProps {
   calendarView?: boolean;
 }
 
+// Key for the shared study groups in localStorage
+const SHARED_STUDY_GROUPS_KEY = 'sharedStudyGroups';
+
 const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const { toast } = useToast();
   const { currentUser } = useAuth();
@@ -44,7 +47,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
     }));
     
     // Check if there are stored groups in localStorage
-    const storedGroups = localStorage.getItem('studyGroups');
+    const storedGroups = localStorage.getItem(SHARED_STUDY_GROUPS_KEY);
     if (storedGroups) {
       try {
         const parsedGroups = JSON.parse(storedGroups);
@@ -52,16 +55,20 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
       } catch (error) {
         console.error('Error parsing stored groups:', error);
         setStudyGroups(transformedGroups);
+        // Initialize with transformed groups if there's an error
+        localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(transformedGroups));
       }
     } else {
       setStudyGroups(transformedGroups);
+      // Initialize with transformed groups if there's nothing stored
+      localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(transformedGroups));
     }
   }, []);
   
   // Save groups to localStorage whenever they change
   useEffect(() => {
     if (studyGroups.length > 0) {
-      localStorage.setItem('studyGroups', JSON.stringify(studyGroups));
+      localStorage.setItem(SHARED_STUDY_GROUPS_KEY, JSON.stringify(studyGroups));
     }
   }, [studyGroups]);
   
@@ -84,11 +91,11 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const handleCreateGroup = (newGroup: Omit<StudyGroup, 'id' | 'createdAt'>) => {
     const createdGroup: StudyGroup = {
       ...newGroup,
-      id: `group-${Date.now()}`,
+      id: `group-${Date.now()}-${currentUser?.id ?? 'anonymous'}`,
       createdAt: new Date().toISOString(),
     };
     
-    setStudyGroups([...studyGroups, createdGroup]);
+    setStudyGroups(prevGroups => [...prevGroups, createdGroup]);
     toast({
       title: "Study group created",
       description: `Your group "${createdGroup.name}" has been created successfully.`,
@@ -177,6 +184,32 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
     
     return true;
   });
+
+  // Function to handle the periodic refresh of study groups
+  useEffect(() => {
+    const checkForUpdates = () => {
+      const storedGroups = localStorage.getItem(SHARED_STUDY_GROUPS_KEY);
+      if (storedGroups) {
+        try {
+          const parsedGroups = JSON.parse(storedGroups);
+          
+          // Only update if the stringified versions are different
+          // This prevents unnecessary re-renders
+          if (JSON.stringify(parsedGroups) !== JSON.stringify(studyGroups)) {
+            setStudyGroups(parsedGroups);
+          }
+        } catch (error) {
+          console.error('Error checking for study group updates:', error);
+        }
+      }
+    };
+    
+    // Check for updates every 5 seconds
+    const intervalId = setInterval(checkForUpdates, 5000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [studyGroups]);
 
   return (
     <div className="min-h-screen bg-gradient-blue">
