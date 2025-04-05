@@ -121,36 +121,44 @@ export function useCreateGroupForm(
     setSearchQuery('');
   };
 
+  // Form validation
+  const isFormValid = Boolean(name && selectedCourse && timeSlots.length > 0);
+
   return {
-    // Form values
-    name,
-    selectedCourse,
-    description,
-    location,
-    maxMembers,
-    selectedTags,
-    timeSlots,
-    visibilityType,
-    selectedUsers,
-    searchQuery,
-    filteredUsers,
-    
-    // Setters
-    setName,
-    setSelectedCourse,
-    setDescription,
-    setLocation,
-    setMaxMembers,
-    setSearchQuery,
+    // Form state
+    formState: {
+      name,
+      selectedCourse,
+      description,
+      location,
+      maxMembers,
+      selectedTags,
+      timeSlots,
+      visibilityType,
+      selectedUsers,
+      searchQuery,
+      filteredUsers,
+    },
     
     // Event handlers
-    handleTagToggle,
-    handleAddTimeSlot,
-    handleRemoveTimeSlot,
-    handleVisibilityChange,
-    handleAddUser,
-    handleRemoveUser,
+    handlers: {
+      setName,
+      setSelectedCourse,
+      setDescription,
+      setLocation,
+      setMaxMembers,
+      setSearchQuery,
+      handleTagToggle,
+      handleAddTimeSlot,
+      handleRemoveTimeSlot,
+      handleVisibilityChange,
+      handleAddUser,
+      handleRemoveUser,
+    },
+    
+    // Form submit and reset methods
     handleSubmit,
-    resetForm
+    resetForm,
+    isFormValid
   };
 }

@@ -9,11 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import AvailabilitySelector from './AvailabilitySelector';
-import GroupDetailsForm from './study-groups/GroupDetailsForm';
-import GroupVisibilitySelector from './study-groups/GroupVisibilitySelector';
-import UserInviteSelector from './study-groups/UserInviteSelector';
 import { useCreateGroupForm } from '@/hooks/useCreateGroupForm';
+import CreateGroupForm from './study-groups/CreateGroupForm';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -23,36 +20,11 @@ interface CreateGroupModalProps {
 
 const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalProps) => {
   const {
-    // Form values
-    name,
-    selectedCourse,
-    description,
-    location,
-    maxMembers,
-    selectedTags,
-    timeSlots,
-    visibilityType,
-    selectedUsers,
-    searchQuery,
-    filteredUsers,
-    
-    // Setters
-    setName,
-    setSelectedCourse,
-    setDescription,
-    setLocation,
-    setMaxMembers,
-    setSearchQuery,
-    
-    // Event handlers
-    handleTagToggle,
-    handleAddTimeSlot,
-    handleRemoveTimeSlot,
-    handleVisibilityChange,
-    handleAddUser,
-    handleRemoveUser,
+    formState,
+    handlers,
+    resetForm,
     handleSubmit,
-    resetForm
+    isFormValid
   } = useCreateGroupForm(onCreateGroup, onClose);
 
   const handleCancel = () => {
@@ -70,44 +42,10 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid gap-4 py-4">
-          <GroupDetailsForm 
-            name={name}
-            setName={setName}
-            selectedCourse={selectedCourse}
-            setSelectedCourse={setSelectedCourse}
-            description={description}
-            setDescription={setDescription}
-            location={location}
-            setLocation={setLocation}
-            maxMembers={maxMembers}
-            setMaxMembers={setMaxMembers}
-            selectedTags={selectedTags}
-            handleTagToggle={handleTagToggle}
-          />
-          
-          <GroupVisibilitySelector 
-            visibilityType={visibilityType}
-            handleVisibilityChange={handleVisibilityChange}
-          />
-          
-          {visibilityType === 'private' && (
-            <UserInviteSelector 
-              selectedUsers={selectedUsers}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              filteredUsers={filteredUsers}
-              handleAddUser={handleAddUser}
-              handleRemoveUser={handleRemoveUser}
-            />
-          )}
-          
-          <AvailabilitySelector
-            timeSlots={timeSlots}
-            onAddTimeSlot={handleAddTimeSlot}
-            onRemoveTimeSlot={handleRemoveTimeSlot}
-          />
-        </div>
+        <CreateGroupForm 
+          formState={formState}
+          handlers={handlers}
+        />
         
         <DialogFooter>
           <Button variant="outline" onClick={handleCancel}>
@@ -116,7 +54,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
           <Button 
             type="submit" 
             onClick={handleSubmit}
-            disabled={!name || !selectedCourse || timeSlots.length === 0}
+            disabled={!isFormValid}
           >
             Create Group
           </Button>
