@@ -26,7 +26,8 @@ const Login = () => {
   const location = useLocation();
   const { login } = useAuth();
 
-  const from = location.state?.from?.pathname || "/account";
+  // Changed default redirect path from "/account" to "/"
+  const from = location.state?.from?.pathname || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
