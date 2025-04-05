@@ -19,39 +19,51 @@ export const useStudyGroupFilters = (
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>(initialOptions.activeFilters || []);
 
   const filteredGroups = studyGroups.filter(group => {
-    // First check for My Groups tab filter
-    if (showMyGroups && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
+    // PUBLIC GROUPS ARE ALWAYS VISIBLE TO ALL USERS - APPLY THIS CHECK FIRST
+    if (group.isPublic) {
+      // For public groups, only apply course and tag filters, but ignore "My Groups" filter
+      if (selectedCourse && group.course.id !== selectedCourse.id) {
+        return false;
+      }
+      
+      if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
+        return false;
+      }
+      
+      // Public groups will be visible even in "My Groups" view if other filters match
+      if (showMyGroups) {
+        return group.members.some(m => m.id === (currentUser?.id ?? ''));
+      }
+      
+      return true;
+    }
+    
+    // For private groups, check visibility
+    // 1. User must be logged in
+    if (!currentUser) {
       return false;
     }
-
-    // Apply course filter
+    
+    // 2. User must have access (created, member, or invited)
+    const hasAccess = group.createdBy === currentUser.id || 
+                     group.members.some(m => m.id === currentUser.id) ||
+                     (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
+                     
+    if (!hasAccess) {
+      return false;
+    }
+    
+    // 3. Apply the remaining filters
+    if (showMyGroups && !group.members.some(m => m.id === currentUser.id)) {
+      return false;
+    }
+    
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
     
-    // Apply tag filters
     if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
       return false;
-    }
-    
-    // PUBLIC GROUPS ARE ALWAYS VISIBLE TO ALL USERS - NO EXCEPTIONS
-    if (group.isPublic) {
-      return true;
-    }
-    
-    // For private groups, only show if:
-    // 1. User created the group
-    // 2. User is a member of the group
-    // 3. User is invited to the group
-    if (!group.isPublic) {
-      if (currentUser) {
-        return (
-          group.createdBy === currentUser.id || 
-          group.members.some(m => m.id === currentUser.id) ||
-          (group.invitedUsers && group.invitedUsers.includes(currentUser.id))
-        );
-      }
-      return false; // Not logged in users can't see private groups
     }
     
     return true;
