@@ -14,7 +14,7 @@ interface StudyGroupListProps {
   selectedCourse: string | null;
   activeFilters: StudyTag[];
   currentUser?: User | null;
-  showMyGroups?: boolean;  // Added this prop
+  showMyGroups?: boolean;
 }
 
 const StudyGroupList: React.FC<StudyGroupListProps> = ({
@@ -24,7 +24,7 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   selectedCourse,
   activeFilters,
   currentUser,
-  showMyGroups = false  // Default to false
+  showMyGroups = false
 }) => {
   const { currentUser: authUser } = useAuth();
   const location = useLocation();

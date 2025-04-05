@@ -18,10 +18,6 @@ export const useStudyGroups = () => {
     // Log the initial groups from mockData to debug
     console.log('Initial groups from mockData:', initialGroups);
     
-    // Clear localStorage for testing to ensure we load the default groups
-    // This is temporary and should be removed in production
-    localStorage.removeItem(SHARED_STUDY_GROUPS_KEY);
-    
     // Check if there are stored groups in localStorage
     const storedGroups = localStorage.getItem(SHARED_STUDY_GROUPS_KEY);
     if (storedGroups) {
