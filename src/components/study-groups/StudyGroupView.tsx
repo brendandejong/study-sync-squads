@@ -38,7 +38,8 @@ const StudyGroupView: React.FC<StudyGroupViewProps> = ({
   console.log('StudyGroupView rendering:', {
     showMyGroups,
     filteredGroupsCount: filteredGroups.length,
-    userGroupsCount
+    userGroupsCount,
+    currentUser: currentUser?.id
   });
 
   return (
@@ -46,7 +47,10 @@ const StudyGroupView: React.FC<StudyGroupViewProps> = ({
       <div className="mb-6">
         <Tabs 
           value={showMyGroups ? "my-groups" : "all-groups"} 
-          onValueChange={(value) => onShowMyGroupsChange(value === "my-groups")}
+          onValueChange={(value) => {
+            console.log('Tab changed to:', value);
+            onShowMyGroupsChange(value === "my-groups");
+          }}
           className="w-full"
         >
           <TabsList className="grid w-full md:w-80 grid-cols-2 bg-blue-50">

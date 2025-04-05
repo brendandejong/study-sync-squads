@@ -5,6 +5,7 @@ import StudyGroupCard from '@/components/StudyGroupCard';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { useLocation } from 'react-router-dom';
 
 interface StudyGroupListProps {
   studyGroups: StudyGroup[];
@@ -24,24 +25,28 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   currentUser
 }) => {
   const { currentUser: authUser } = useAuth();
+  const location = useLocation();
   
   // Use provided currentUser or fallback to authUser
   const user = currentUser || authUser;
+  const isMyGroupsTab = location.pathname === '/my-groups' || window.location.href.includes('my-groups=true');
   
   // Add more detailed console logs for better debugging
   console.log('StudyGroupList rendering with groups:', studyGroups);
+  console.log('Current location:', location.pathname);
+  console.log('Is My Groups tab:', isMyGroupsTab);
   console.log('Selected course ID:', selectedCourse);
   console.log('Active filters:', activeFilters);
   
   const emptyStateMessage = () => {
     // If we're on the My Groups tab
-    if (studyGroups.length === 0 && window.location.pathname === '/my-groups') {
-      return "You haven't joined any study groups yet.";
+    if (isMyGroupsTab || window.location.href.includes('my-groups=true')) {
+      return "You haven't joined any study groups yet. Join some groups or create your own!";
     }
     
     // If filters are applied
     if (selectedCourse || activeFilters.length > 0) {
-      return "Try adjusting your filters to see more groups.";
+      return "No groups match your current filters. Try adjusting your filters to see more groups.";
     }
     
     // Default message
