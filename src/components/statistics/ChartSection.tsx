@@ -85,17 +85,13 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
                 data={studyTypeData}
                 cx="50%"
                 cy="50%"
-                outerRadius={50}
+                outerRadius={45}
                 innerRadius={25}
                 fill="#8884d8"
                 dataKey="value"
-                label={({ name, percent }) => {
-                  // Truncate long labels and make font smaller
-                  const displayName = name.length > 8 ? name.substring(0, 7) + '...' : name;
-                  return `${displayName} ${(percent * 100).toFixed(0)}%`;
-                }}
-                labelLine={false}
-                style={{ fontSize: '8px' }}
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                labelLine={{ strokeWidth: 0.5, stroke: "#666" }}
+                style={{ fontSize: '7px' }}
               >
                 {studyTypeData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
