@@ -26,8 +26,8 @@ const queryClient = new QueryClient({
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <TooltipProvider>
         <ErrorBoundary fallback={<div className="p-8">Something went wrong. Please try refreshing the page.</div>}>
           <BrowserRouter>
             <Routes>
@@ -69,8 +69,8 @@ const App = () => (
         </ErrorBoundary>
         <Toaster />
         <Sonner />
-      </AuthProvider>
-    </TooltipProvider>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
