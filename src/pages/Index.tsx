@@ -140,21 +140,11 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const userGroupsCount = userGroups.length;
 
   const filteredGroups = studyGroups.filter(group => {
-    // Current user's created groups always visible
-    if (currentUser && group.createdBy === currentUser.id) {
-      return true;
+    // First check for My Groups tab filter
+    if (showMyGroups && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
+      return false;
     }
-    
-    // Filter by privacy settings
-    if (!group.isPublic) {
-      // For private groups, check if the current user is invited
-      const isInvited = currentUser && group.invitedUsers?.includes(currentUser.id);
-      // For private groups, only show if the user is a member or invited
-      if (!isInvited && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
-        return false;
-      }
-    }
-    
+
     // Apply course filter
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
@@ -165,9 +155,24 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
       return false;
     }
     
-    // Filter for My Groups tab
-    if (showMyGroups && !group.members.some(m => m.id === (currentUser?.id ?? ''))) {
-      return false;
+    // Public groups are always visible to everyone
+    if (group.isPublic) {
+      return true;
+    }
+    
+    // For private groups, only show if:
+    // 1. User created the group
+    // 2. User is a member of the group
+    // 3. User is invited to the group
+    if (!group.isPublic) {
+      if (currentUser) {
+        return (
+          group.createdBy === currentUser.id || 
+          group.members.some(m => m.id === currentUser.id) ||
+          (group.invitedUsers && group.invitedUsers.includes(currentUser.id))
+        );
+      }
+      return false; // Not logged in users can't see private groups
     }
     
     return true;
