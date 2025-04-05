@@ -15,6 +15,8 @@ interface StatisticsTabsProps {
   sessions: StudySession[];
   onEditStats: () => void;
   onDeleteGoal: (goalId: string) => void;
+  onCompleteGoal: (goalId: string) => void;
+  onUpdateGoalProgress: (goalId: string, hours: number) => void;
 }
 
 const StatisticsTabs = ({ 
@@ -25,7 +27,9 @@ const StatisticsTabs = ({
   studyTypeData,
   sessions,
   onEditStats, 
-  onDeleteGoal 
+  onDeleteGoal,
+  onCompleteGoal,
+  onUpdateGoalProgress
 }: StatisticsTabsProps) => {
   return (
     <Tabs defaultValue="overview" className="w-full">
@@ -56,7 +60,9 @@ const StatisticsTabs = ({
       <TabsContent value="goals" className="space-y-6">
         <GoalList 
           goals={goals} 
-          onDeleteGoal={onDeleteGoal} 
+          onDeleteGoal={onDeleteGoal}
+          onCompleteGoal={onCompleteGoal}
+          onUpdateGoalProgress={onUpdateGoalProgress}
         />
       </TabsContent>
     </Tabs>

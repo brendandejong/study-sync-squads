@@ -6,14 +6,22 @@ import { StudyGoal } from '@/hooks/useStats';
 interface GoalListProps {
   goals: StudyGoal[];
   onDeleteGoal: (goalId: string) => void;
+  onCompleteGoal: (goalId: string) => void;
+  onUpdateGoalProgress: (goalId: string, hours: number) => void;
 }
 
-const GoalList = ({ goals, onDeleteGoal }: GoalListProps) => {
+const GoalList = ({ goals, onDeleteGoal, onCompleteGoal, onUpdateGoalProgress }: GoalListProps) => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {goals.length > 0 ? (
         goals.map((goal) => (
-          <GoalCard key={goal.id} goal={goal} onDelete={onDeleteGoal} />
+          <GoalCard 
+            key={goal.id} 
+            goal={goal} 
+            onDelete={onDeleteGoal}
+            onComplete={onCompleteGoal}
+            onMarkProgress={onUpdateGoalProgress}
+          />
         ))
       ) : (
         <div className="col-span-2 p-8 text-center bg-blue-50 rounded-lg">

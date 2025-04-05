@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { useStats, StudyGoal } from '@/hooks/useStats';
@@ -7,7 +6,7 @@ import { useCourses } from '@/hooks/useCourses';
 // Hook to manage state and handlers for the Statistics page
 export const useStatisticsPage = () => {
   const { toast } = useToast();
-  const { goals, stats, sessions, addGoal, updateStats, logStudySession, deleteGoal } = useStats();
+  const { goals, stats, sessions, addGoal, updateStats, logStudySession, deleteGoal, updateGoalProgress } = useStats();
   const { courses } = useCourses();
 
   // Dialog open states
@@ -148,6 +147,31 @@ export const useStatisticsPage = () => {
     }
   };
 
+  const handleCompleteGoal = (goalId: string) => {
+    const goal = goals.find(g => g.id === goalId);
+    if (goal) {
+      // Calculate remaining hours to complete
+      const remainingHours = goal.targetHours - goal.completedHours;
+      if (remainingHours > 0) {
+        updateGoalProgress(goalId, remainingHours);
+        
+        toast({
+          title: "Goal completed",
+          description: `Congratulations! "${goal.title}" has been marked as completed.`
+        });
+      }
+    }
+  };
+  
+  const handleUpdateGoalProgress = (goalId: string, hours: number) => {
+    updateGoalProgress(goalId, hours);
+    
+    toast({
+      title: "Progress updated",
+      description: `Added ${hours} hour${hours !== 1 ? 's' : ''} to your study goal.`
+    });
+  };
+
   return {
     // Data
     goals,
@@ -180,6 +204,8 @@ export const useStatisticsPage = () => {
     handleAddSession,
     handleUpdateStats,
     confirmDeleteGoal,
-    handleDeleteGoal
+    handleDeleteGoal,
+    handleCompleteGoal,
+    handleUpdateGoalProgress
   };
 };

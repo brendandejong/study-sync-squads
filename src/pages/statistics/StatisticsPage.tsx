@@ -39,7 +39,9 @@ const StatisticsPage = () => {
     handleAddSession,
     handleUpdateStats,
     confirmDeleteGoal,
-    handleDeleteGoal
+    handleDeleteGoal,
+    handleCompleteGoal,
+    handleUpdateGoalProgress
   } = useStatisticsPage();
 
   return (
@@ -61,6 +63,8 @@ const StatisticsPage = () => {
           sessions={sessions}
           onEditStats={() => setIsStatsDialogOpen(true)}
           onDeleteGoal={confirmDeleteGoal}
+          onCompleteGoal={handleCompleteGoal}
+          onUpdateGoalProgress={handleUpdateGoalProgress}
         />
         
         <StatisticsDialogs

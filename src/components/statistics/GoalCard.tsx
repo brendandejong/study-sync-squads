@@ -3,46 +3,84 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { Trash } from 'lucide-react';
+import { Trash, CheckCircle2 } from 'lucide-react';
 import { StudyGoal } from '@/hooks/useStats';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 
 interface GoalCardProps {
   goal: StudyGoal;
   onDelete: (goalId: string) => void;
+  onComplete: (goalId: string) => void;
+  onMarkProgress: (goalId: string, hours: number) => void;
 }
 
-const GoalCard = ({ goal, onDelete }: GoalCardProps) => {
+const GoalCard = ({ goal, onDelete, onComplete, onMarkProgress }: GoalCardProps) => {
+  const isCompleted = goal.completedHours >= goal.targetHours;
+  
   return (
-    <Card className="card-gradient">
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-center">
-          <CardTitle className="text-lg font-medium">{goal.title}</CardTitle>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => onDelete(goal.id)}
-            className="text-red-500 hover:text-red-700 hover:bg-red-50"
-          >
-            <Trash className="h-4 w-4" />
-          </Button>
-        </div>
-        <CardDescription>
-          Target: {goal.targetHours} hours • Due: {new Date(goal.deadline).toLocaleDateString()}
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-2">
-          <div className="flex justify-between text-sm">
-            <span>Progress: {goal.completedHours}/{goal.targetHours} hours</span>
-            <span className="font-medium">{Math.round((goal.completedHours / goal.targetHours) * 100)}%</span>
-          </div>
-          <Progress 
-            value={(goal.completedHours / goal.targetHours) * 100} 
-            className="h-2" 
-          />
-        </div>
-      </CardContent>
-    </Card>
+    <ContextMenu>
+      <ContextMenuTrigger>
+        <Card className={`card-gradient cursor-pointer hover:shadow-md transition-shadow ${isCompleted ? 'bg-green-50 border-green-200' : ''}`}>
+          <CardHeader className="pb-2">
+            <div className="flex justify-between items-center">
+              <CardTitle className="text-lg font-medium flex items-center gap-2">
+                {isCompleted && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                {goal.title}
+              </CardTitle>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete(goal.id);
+                }}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
+            <CardDescription>
+              Target: {goal.targetHours} hours • Due: {new Date(goal.deadline).toLocaleDateString()}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progress: {goal.completedHours}/{goal.targetHours} hours</span>
+                <span className="font-medium">{Math.round((goal.completedHours / goal.targetHours) * 100)}%</span>
+              </div>
+              <Progress 
+                value={(goal.completedHours / goal.targetHours) * 100} 
+                className={`h-2 ${isCompleted ? 'bg-green-100' : ''}`}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem
+          onClick={() => onComplete(goal.id)}
+          disabled={isCompleted}
+          className={isCompleted ? 'text-gray-400' : 'text-green-600'}
+        >
+          <CheckCircle2 className="mr-2 h-4 w-4" />
+          {isCompleted ? 'Already completed' : 'Mark as completed'}
+        </ContextMenuItem>
+        
+        <ContextMenuItem onClick={() => onMarkProgress(goal.id, 1)}>
+          Add 1 hour of progress
+        </ContextMenuItem>
+        
+        <ContextMenuItem onClick={() => onMarkProgress(goal.id, 2)}>
+          Add 2 hours of progress
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };
 
