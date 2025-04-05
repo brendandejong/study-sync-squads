@@ -38,12 +38,17 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   const [selectedGroup, setSelectedGroup] = useState<StudyGroup | null>(null);
   const [isGroupDetailsOpen, setIsGroupDetailsOpen] = useState(false);
   
-  // Filter state management
-  const [showMyGroups, setShowMyGroups] = useState<boolean>(myGroupsOnly);
+  // Determine if we should show My Groups based on props or URL
+  const [showMyGroups, setShowMyGroups] = useState<boolean>(
+    myGroupsOnly || location.pathname === '/my-groups'
+  );
   
+  // Ensure showMyGroups updates if we navigate
   useEffect(() => {
-    setShowMyGroups(location.pathname === '/my-groups');
-  }, [location.pathname]);
+    const isMyGroupsPath = location.pathname === '/my-groups';
+    console.log('Index - Path changed to:', location.pathname, 'isMyGroupsPath:', isMyGroupsPath);
+    setShowMyGroups(isMyGroupsPath || myGroupsOnly);
+  }, [location.pathname, myGroupsOnly]);
   
   const { 
     selectedCourse,
@@ -64,13 +69,11 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
   };
   
   // Debug logging
-  console.log('Index page rendering: ', {
-    totalGroups: studyGroups.length, 
-    filteredCount: filteredGroups.length,
-    userGroupsCount,
-    showMyGroups,
-    path: location.pathname
-  });
+  console.log('Index - Current path:', location.pathname);
+  console.log('Index - ShowMyGroups state:', showMyGroups);
+  console.log('Index - Total groups:', studyGroups.length); 
+  console.log('Index - Filtered groups:', filteredGroups.length);
+  console.log('Index - User groups count:', userGroupsCount);
 
   return (
     <div className="min-h-screen bg-gradient-blue">

@@ -31,12 +31,11 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   const user = currentUser || authUser;
   const isMyGroupsTab = location.pathname === '/my-groups' || window.location.href.includes('my-groups=true');
   
-  // Add more detailed console logs for better debugging
-  console.log('StudyGroupList rendering with groups:', studyGroups);
-  console.log('Current location:', location.pathname);
-  console.log('Is My Groups tab:', isMyGroupsTab);
-  console.log('Selected course ID:', selectedCourse);
-  console.log('Active filters:', activeFilters);
+  // Detailed console logs for debugging
+  console.log('StudyGroupList - Groups to display:', studyGroups.map(g => g.id));
+  console.log('StudyGroupList - Current location:', location.pathname);
+  console.log('StudyGroupList - Is My Groups tab:', isMyGroupsTab);
+  console.log('StudyGroupList - Groups count:', studyGroups.length);
   
   const emptyStateMessage = () => {
     // If we're on the My Groups tab

@@ -18,27 +18,20 @@ export const useStudyGroupFilters = (
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialOptions.selectedCourse || null);
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>(initialOptions.activeFilters || []);
 
-  // Log the filter state for debugging
-  console.log('Filter state:', { 
-    showMyGroups, 
-    selectedCourse: selectedCourse?.code, 
-    activeFilters,
-    totalGroups: studyGroups.length,
-    currentUserId: currentUser?.id
-  });
-
-  // First, get user groups - these are groups where the user is a member
+  // Get user groups - these are groups where the user is a member
   const userGroups = currentUser 
     ? studyGroups.filter(group => 
         group.members.some(member => member.id === currentUser.id)
       )
     : [];
   
+  console.log('Current user ID:', currentUser?.id);
   console.log('User is member of these groups:', userGroups.map(g => g.id));
+  console.log('Show My Groups flag is set to:', showMyGroups);
 
-  // Apply filters based on current tab and filter selections
+  // Determine which groups to display based on current view
   const filteredGroups = showMyGroups
-    ? userGroups // If on My Groups tab, only show user's groups
+    ? userGroups // When on My Groups tab, ONLY show user's groups
     : studyGroups.filter(group => {
         // For "All Groups" view, apply course and tag filters
         
@@ -68,12 +61,8 @@ export const useStudyGroupFilters = (
                (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
       });
 
-  // Log the filtered results for debugging
-  console.log('Filtered groups count:', filteredGroups.length);
-  if (showMyGroups) {
-    console.log('My Groups IDs:', filteredGroups.map(g => g.id));
-  }
-
+  console.log('Filtered groups when showMyGroups =', showMyGroups, ':', filteredGroups.map(g => g.id));
+  
   return {
     showMyGroups,
     setShowMyGroups,
