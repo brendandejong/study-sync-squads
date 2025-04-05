@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { StudyGroup, StudyTag, User } from '@/types';
+import { StudyGroup, StudyTag, User, Course } from '@/types';
 import StudyGroupCard from '@/components/StudyGroupCard';
 import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
@@ -28,8 +28,10 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   // Use provided currentUser or fallback to authUser
   const user = currentUser || authUser;
   
-  // Add console logs to debug what groups are being passed to the component
+  // Add more detailed console logs for better debugging
   console.log('StudyGroupList rendering with groups:', studyGroups);
+  console.log('Selected course ID:', selectedCourse);
+  console.log('Active filters:', activeFilters);
   
   return (
     <div>

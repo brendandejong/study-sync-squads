@@ -18,6 +18,14 @@ export const useStudyGroupFilters = (
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(initialOptions.selectedCourse || null);
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>(initialOptions.activeFilters || []);
 
+  // Log the filter state for debugging
+  console.log('Filter state:', { 
+    showMyGroups, 
+    selectedCourse: selectedCourse?.code, 
+    activeFilters,
+    totalGroups: studyGroups.length
+  });
+
   const filteredGroups = studyGroups.filter(group => {
     // First check course filter (applies to all groups)
     if (selectedCourse && group.course.id !== selectedCourse.id) {
@@ -50,6 +58,9 @@ export const useStudyGroupFilters = (
            group.members.some(m => m.id === currentUser.id) ||
            (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
   });
+
+  // Log the filtered results for debugging
+  console.log('Filtered groups:', filteredGroups.length);
 
   return {
     showMyGroups,

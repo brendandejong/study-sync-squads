@@ -30,6 +30,9 @@ const CourseDropdown = ({
   onAddCourseClick,
   closeDropdown
 }: CourseDropdownProps) => {
+  // Sort the subjects alphabetically
+  const sortedSubjects = Object.keys(groupedCourses).sort();
+  
   return (
     <div className="absolute z-50 mt-1 w-full rounded-md border border-gray-200 bg-white shadow-lg">
       <div className="p-2">
@@ -43,17 +46,17 @@ const CourseDropdown = ({
       </div>
       
       <div className="max-h-[300px] overflow-y-auto">
-        {Object.keys(groupedCourses).length === 0 ? (
+        {sortedSubjects.length === 0 ? (
           <div className="px-2 py-3 text-center text-sm text-gray-500">
             No course found.
           </div>
         ) : (
           <div className="p-1">
-            {Object.entries(groupedCourses).map(([subject, subjectCourses]) => (
+            {sortedSubjects.map((subject) => (
               <CourseGroup
                 key={subject}
                 subject={subject}
-                courses={subjectCourses}
+                courses={groupedCourses[subject].sort((a, b) => a.code.localeCompare(b.code))}
                 selectedCourse={selectedCourse}
                 onSelectCourse={(course) => {
                   onSelectCourse(course);
