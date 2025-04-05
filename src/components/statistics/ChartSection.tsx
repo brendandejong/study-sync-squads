@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { BarChart as BarChartIcon, Calendar, Edit } from 'lucide-react';
+import { BarChartIcon, Calendar, Edit } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { useToast } from '@/components/ui/use-toast';
@@ -39,20 +39,18 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
           </div>
           <CardDescription className="text-xs md:text-sm">Hours studied per day this week</CardDescription>
         </CardHeader>
-        <CardContent className="pt-2 h-[calc(100%-60px)]">
-          <div className="w-full h-full">
-            <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
-              <BarChart 
-                data={weeklyProgressData} 
-                margin={{ top: 10, right: 10, left: 0, bottom: 5 }}
-              >
-                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                <YAxis tick={{ fontSize: 10 }} />
-                <Tooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" />
-              </BarChart>
-            </ChartContainer>
-          </div>
+        <CardContent className="pt-2 px-2 h-[calc(100%-70px)]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={weeklyProgressData} 
+              margin={{ top: 5, right: 5, left: -15, bottom: 5 }}
+            >
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+              <YAxis tick={{ fontSize: 10 }} />
+              <Tooltip content={<ChartTooltipContent />} />
+              <Bar dataKey="hours" fill="#93c5fd" />
+            </BarChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
       
@@ -78,28 +76,27 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
           </div>
           <CardDescription className="text-xs md:text-sm">Your preferred study methods</CardDescription>
         </CardHeader>
-        <CardContent className="pt-2 h-[calc(100%-60px)]">
-          <div className="w-full h-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
-                <Pie
-                  data={studyTypeData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={70}
-                  fill="#8884d8"
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
-                >
-                  {studyTypeData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
+        <CardContent className="pt-2 px-2 h-[calc(100%-70px)]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
+              <Pie
+                data={studyTypeData}
+                cx="50%"
+                cy="50%"
+                outerRadius={60}
+                innerRadius={30}
+                fill="#8884d8"
+                dataKey="value"
+                label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                labelLine={false}
+              >
+                {studyTypeData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     </div>
