@@ -1,4 +1,5 @@
 
+import React from 'react';
 import { StudyGroup, StudyTag, User } from '@/types';
 import StudyGroupCard from '@/components/StudyGroupCard';
 import { Button } from '@/components/ui/button';
@@ -14,14 +15,14 @@ interface StudyGroupListProps {
   currentUser?: User | null;
 }
 
-const StudyGroupList = ({
+const StudyGroupList: React.FC<StudyGroupListProps> = ({
   studyGroups,
   onGroupClick,
   onCreateClick,
   selectedCourse,
   activeFilters,
   currentUser
-}: StudyGroupListProps) => {
+}) => {
   const { currentUser: authUser } = useAuth();
   
   // Use provided currentUser or fallback to authUser
