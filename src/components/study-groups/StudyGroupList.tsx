@@ -33,6 +33,21 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
   console.log('Selected course ID:', selectedCourse);
   console.log('Active filters:', activeFilters);
   
+  const emptyStateMessage = () => {
+    // If we're on the My Groups tab
+    if (studyGroups.length === 0 && window.location.pathname === '/my-groups') {
+      return "You haven't joined any study groups yet.";
+    }
+    
+    // If filters are applied
+    if (selectedCourse || activeFilters.length > 0) {
+      return "Try adjusting your filters to see more groups.";
+    }
+    
+    // Default message
+    return "There are no study groups available at the moment.";
+  };
+  
   return (
     <div>
       {studyGroups.length > 0 ? (
@@ -51,9 +66,7 @@ const StudyGroupList: React.FC<StudyGroupListProps> = ({
         <div className="bg-white rounded-lg border border-dashed border-gray-300 p-8 text-center">
           <h3 className="font-medium text-lg text-gray-700 mb-2">No study groups found</h3>
           <p className="text-gray-500 mb-6">
-            {selectedCourse || activeFilters.length > 0
-              ? "Try adjusting your filters to see more groups."
-              : "There are no study groups available at the moment."}
+            {emptyStateMessage()}
           </p>
           <Button onClick={onCreateClick} className="bg-indigo-600 hover:bg-indigo-700">
             <Plus className="h-4 w-4 mr-2" />

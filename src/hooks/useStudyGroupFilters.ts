@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StudyGroup, StudyTag, Course, User } from '@/types';
 import { useAuth } from '@/context/AuthContext';
 
@@ -23,32 +23,34 @@ export const useStudyGroupFilters = (
     showMyGroups, 
     selectedCourse: selectedCourse?.code, 
     activeFilters,
-    totalGroups: studyGroups.length
+    totalGroups: studyGroups.length,
+    currentUserId: currentUser?.id
   });
 
   const filteredGroups = studyGroups.filter(group => {
-    // First check course filter (applies to all groups)
+    // For "My Groups", ONLY show groups where the user is a member
+    if (showMyGroups) {
+      return currentUser ? group.members.some(member => member.id === currentUser.id) : false;
+    }
+    
+    // For "All Groups" view, apply course and tag filters
+    
+    // First check course filter
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
     
-    // Then check tag filters (applies to all groups)
+    // Then check tag filters
     if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
       return false;
     }
     
-    // In "My Groups" view, only show groups where the user is a member
-    if (showMyGroups) {
-      return currentUser ? group.members.some(m => m.id === currentUser.id) : false;
-    }
-    
-    // For the "All Groups" view:
-    // 1. All public groups should be visible at this point (after course and tag filtering)
+    // For public groups, they should be visible to everyone
     if (group.isPublic) {
       return true;
     }
     
-    // 2. For private groups, user must be logged in and have access
+    // For private groups, user must be logged in and have access
     if (!currentUser) {
       return false; // No access to private groups if not logged in
     }
@@ -60,7 +62,10 @@ export const useStudyGroupFilters = (
   });
 
   // Log the filtered results for debugging
-  console.log('Filtered groups:', filteredGroups.length);
+  console.log('Filtered groups count:', filteredGroups.length);
+  if (showMyGroups) {
+    console.log('My Groups IDs:', filteredGroups.map(g => g.id));
+  }
 
   return {
     showMyGroups,

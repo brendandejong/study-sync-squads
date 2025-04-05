@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Course, StudyGroup, StudyTag } from '@/types';
+import { Course, StudyGroup, StudyTag, User } from '@/types';
 import FilterPanel from '@/components/study-groups/FilterPanel';
 import StudyGroupList from '@/components/study-groups/StudyGroupList';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
