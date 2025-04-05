@@ -20,18 +20,28 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
 
-  // Changed default redirect path from "/account" to "/"
+  // Default redirect path is "/"
   const from = location.state?.from?.pathname || "/";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    
+    if (!email || !password) {
+      toast({
+        variant: "destructive",
+        title: "Login failed",
+        description: "Please enter both email and password",
+      });
+      return;
+    }
+    
+    setIsSubmitting(true);
     
     try {
       await login(email, password);
@@ -40,15 +50,17 @@ const Login = () => {
         description: "Welcome back!",
       });
       
+      // Navigate to the home page after successful login
       navigate(from, { replace: true });
     } catch (error) {
+      console.error("Login error:", error);
       toast({
         variant: "destructive",
         title: "Login failed",
-        description: error instanceof Error ? error.message : "An error occurred",
+        description: error instanceof Error ? error.message : "Invalid email or password",
       });
     } finally {
-      setIsLoading(false);
+      setIsSubmitting(false);
     }
   };
 
@@ -76,7 +88,7 @@ const Login = () => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                disabled={isLoading}
+                disabled={isSubmitting}
                 className="border-indigo-100 focus:border-indigo-300"
               />
             </div>
@@ -95,7 +107,7 @@ const Login = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={isLoading}
+                  disabled={isSubmitting}
                   className="border-indigo-100 focus:border-indigo-300"
                 />
                 <Button
@@ -114,9 +126,9 @@ const Login = () => {
             <Button 
               type="submit" 
               className="w-full bg-indigo-500 hover:bg-indigo-600" 
-              disabled={isLoading}
+              disabled={isSubmitting}
             >
-              {isLoading ? (
+              {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
                   Logging in...

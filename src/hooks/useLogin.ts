@@ -65,22 +65,13 @@ export const useLogin = (setCurrentUser: (user: User) => void, setIsAuthenticate
             setIsAuthenticated(true);
             saveUserToStorage(user);
             
-            toast({
-              title: 'Login successful',
-              description: 'Welcome back!',
-            });
-            
+            // We're not showing a toast here because Login.tsx will handle it
             resolve();
           } else {
-            toast({
-              variant: 'destructive',
-              title: 'Login failed',
-              description: 'Invalid email or password.',
-            });
-            
             reject(new Error('Invalid email or password'));
           }
         } catch (error) {
+          console.error('Login error:', error);
           reject(error);
         } finally {
           setIsLoading(false);

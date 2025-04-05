@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { BarChartIcon, Calendar, Edit } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
-import { useToast } from '@/components/ui/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface ChartSectionProps {
   weeklyProgressData: { name: string; hours: number }[];
@@ -40,17 +40,19 @@ const ChartSection = ({ weeklyProgressData, studyTypeData }: ChartSectionProps) 
           <CardDescription className="text-xs md:text-sm">Hours studied per day this week</CardDescription>
         </CardHeader>
         <CardContent className="pt-2 px-2 h-[calc(100%-70px)]">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart 
-              data={weeklyProgressData} 
-              margin={{ top: 5, right: 5, left: -15, bottom: 5 }}
-            >
-              <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-              <YAxis tick={{ fontSize: 10 }} />
-              <Tooltip content={<ChartTooltipContent />} />
-              <Bar dataKey="hours" fill="#93c5fd" />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartContainer config={{ hours: { color: "#93c5fd" } }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={weeklyProgressData} 
+                margin={{ top: 5, right: 5, left: -15, bottom: 5 }}
+              >
+                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                <YAxis tick={{ fontSize: 10 }} />
+                <Tooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="hours" fill="var(--color-hours, #93c5fd)" />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
       
