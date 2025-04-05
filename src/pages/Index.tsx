@@ -155,7 +155,7 @@ const Index = ({ myGroupsOnly = false, calendarView = false }: IndexProps) => {
       return false;
     }
     
-    // Public groups are always visible to everyone
+    // PUBLIC GROUPS ARE ALWAYS VISIBLE TO ALL USERS - NO EXCEPTIONS
     if (group.isPublic) {
       return true;
     }
