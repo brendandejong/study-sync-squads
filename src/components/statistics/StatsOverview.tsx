@@ -1,8 +1,7 @@
-
 import React from 'react';
 import { Clock, BookOpen, Target, Flame } from 'lucide-react';
 import StatsCard from './StatsCard';
-import { StudyStats } from '@/hooks/useStats';
+import { StudyStats } from '@/hooks/statistics/types';
 
 interface StatsOverviewProps {
   stats: StudyStats;

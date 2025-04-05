@@ -1,10 +1,9 @@
-
 import React from 'react';
 import AddGoalDialog from '@/components/statistics/dialogs/AddGoalDialog';
 import LogSessionDialog from '@/components/statistics/dialogs/LogSessionDialog';
 import EditStatsDialog from '@/components/statistics/dialogs/EditStatsDialog';
 import DeleteGoalDialog from '@/components/statistics/dialogs/DeleteGoalDialog';
-import { StudyGoal } from '@/hooks/useStats';
+import { StudyGoal } from '@/hooks/statistics/types';
 
 interface StatisticsDialogsProps {
   // Dialog states
