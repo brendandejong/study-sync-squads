@@ -1,6 +1,5 @@
 
-import { useState, useEffect } from 'react';
-import { Course, StudyGroup, StudyTag, TimeSlot, User } from '@/types';
+import { StudyGroup } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -10,12 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/components/ui/use-toast';
 import AvailabilitySelector from './AvailabilitySelector';
 import GroupDetailsForm from './study-groups/GroupDetailsForm';
 import GroupVisibilitySelector from './study-groups/GroupVisibilitySelector';
 import UserInviteSelector from './study-groups/UserInviteSelector';
+import { useCreateGroupForm } from '@/hooks/useCreateGroupForm';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -24,117 +22,42 @@ interface CreateGroupModalProps {
 }
 
 const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalProps) => {
-  const { currentUser } = useAuth();
-  const { toast } = useToast();
-  
-  // Form state
-  const [name, setName] = useState('');
-  const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
-  const [description, setDescription] = useState('');
-  const [location, setLocation] = useState('');
-  const [maxMembers, setMaxMembers] = useState(5);
-  const [selectedTags, setSelectedTags] = useState<StudyTag[]>([]);
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
-  
-  // Visibility and user selection state
-  const [visibilityType, setVisibilityType] = useState<'public' | 'private'>('public');
-  const [isPublic, setIsPublic] = useState(true);
-  const [availableUsers, setAvailableUsers] = useState<User[]>([]);
-  const [selectedUsers, setSelectedUsers] = useState<User[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  // Fetch available users
-  useEffect(() => {
-    import('@/data/mockData').then(({ users }) => {
-      setAvailableUsers(users.filter(user => user.id !== currentUser?.id));
-    });
-  }, [currentUser?.id]);
-
-  // Filter users based on search query
-  const filteredUsers = availableUsers.filter(user => 
-    user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    user.email.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const handleTagToggle = (tag: StudyTag) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags(selectedTags.filter(t => t !== tag));
-    } else {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
-
-  const handleAddTimeSlot = (timeSlot: TimeSlot) => {
-    setTimeSlots([...timeSlots, timeSlot]);
-  };
-
-  const handleRemoveTimeSlot = (index: number) => {
-    setTimeSlots(timeSlots.filter((_, i) => i !== index));
-  };
-
-  const handleVisibilityChange = (type: 'public' | 'private') => {
-    setVisibilityType(type);
-    setIsPublic(type === 'public');
+  const {
+    // Form values
+    name,
+    selectedCourse,
+    description,
+    location,
+    maxMembers,
+    selectedTags,
+    timeSlots,
+    visibilityType,
+    selectedUsers,
+    searchQuery,
+    filteredUsers,
     
-    // Clear selected users if switching to public
-    if (type === 'public') {
-      setSelectedUsers([]);
-    }
-  };
-
-  const handleAddUser = (user: User) => {
-    if (!selectedUsers.some(u => u.id === user.id)) {
-      setSelectedUsers([...selectedUsers, user]);
-    }
-  };
-
-  const handleRemoveUser = (userId: string) => {
-    setSelectedUsers(selectedUsers.filter(user => user.id !== userId));
-  };
-
-  const handleSubmit = () => {
-    if (!selectedCourse || !currentUser) return;
+    // Setters
+    setName,
+    setSelectedCourse,
+    setDescription,
+    setLocation,
+    setMaxMembers,
+    setSearchQuery,
     
-    if (!isPublic && selectedUsers.length === 0) {
-      toast({
-        title: "Error",
-        description: "Please select at least one user to invite to your private group.",
-        variant: "destructive"
-      });
-      return;
-    }
-    
-    const newGroup = {
-      name,
-      course: selectedCourse,
-      description,
-      tags: selectedTags,
-      members: [currentUser] as User[],
-      maxMembers,
-      timeSlots,
-      location,
-      createdBy: currentUser.id,
-      isPublic,
-      invitedUsers: isPublic ? undefined : selectedUsers.map(user => user.id),
-    };
-    
-    onCreateGroup(newGroup);
+    // Event handlers
+    handleTagToggle,
+    handleAddTimeSlot,
+    handleRemoveTimeSlot,
+    handleVisibilityChange,
+    handleAddUser,
+    handleRemoveUser,
+    handleSubmit,
+    resetForm
+  } = useCreateGroupForm(onCreateGroup, onClose);
+
+  const handleCancel = () => {
     resetForm();
     onClose();
-  };
-
-  const resetForm = () => {
-    setName('');
-    setSelectedCourse(null);
-    setDescription('');
-    setLocation('');
-    setMaxMembers(5);
-    setSelectedTags([]);
-    setTimeSlots([]);
-    setIsPublic(true);
-    setVisibilityType('public');
-    setSelectedUsers([]);
-    setSearchQuery('');
   };
 
   return (
@@ -187,10 +110,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreateGroup }: CreateGroupModalPr
         </div>
         
         <DialogFooter>
-          <Button variant="outline" onClick={() => {
-            resetForm();
-            onClose();
-          }}>
+          <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
           <Button 
