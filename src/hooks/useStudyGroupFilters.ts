@@ -19,45 +19,7 @@ export const useStudyGroupFilters = (
   const [activeFilters, setActiveFilters] = useState<StudyTag[]>(initialOptions.activeFilters || []);
 
   const filteredGroups = studyGroups.filter(group => {
-    // PUBLIC GROUPS ARE ALWAYS VISIBLE TO ALL USERS - APPLY THIS CHECK FIRST
-    if (group.isPublic) {
-      // For public groups, only apply course and tag filters, but ignore "My Groups" filter
-      if (selectedCourse && group.course.id !== selectedCourse.id) {
-        return false;
-      }
-      
-      if (activeFilters.length > 0 && !group.tags.some(tag => activeFilters.includes(tag))) {
-        return false;
-      }
-      
-      // Public groups will be visible even in "My Groups" view if other filters match
-      if (showMyGroups) {
-        return group.members.some(m => m.id === (currentUser?.id ?? ''));
-      }
-      
-      return true;
-    }
-    
-    // For private groups, check visibility
-    // 1. User must be logged in
-    if (!currentUser) {
-      return false;
-    }
-    
-    // 2. User must have access (created, member, or invited)
-    const hasAccess = group.createdBy === currentUser.id || 
-                     group.members.some(m => m.id === currentUser.id) ||
-                     (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
-                     
-    if (!hasAccess) {
-      return false;
-    }
-    
-    // 3. Apply the remaining filters
-    if (showMyGroups && !group.members.some(m => m.id === currentUser.id)) {
-      return false;
-    }
-    
+    // First check course and tag filters as they apply to all groups
     if (selectedCourse && group.course.id !== selectedCourse.id) {
       return false;
     }
@@ -66,6 +28,38 @@ export const useStudyGroupFilters = (
       return false;
     }
     
+    // PUBLIC GROUPS ARE ALWAYS VISIBLE except in "My Groups" view
+    if (group.isPublic) {
+      // In "My Groups" view, only show public groups where user is a member
+      if (showMyGroups) {
+        return currentUser ? group.members.some(m => m.id === currentUser.id) : false;
+      }
+      
+      // For non-My Groups view, all public groups that pass filters are visible
+      return true;
+    }
+    
+    // For private groups
+    // User must be logged in to see any private group
+    if (!currentUser) {
+      return false;
+    }
+    
+    // Check if user has access to this private group
+    const hasAccess = group.createdBy === currentUser.id || 
+                      group.members.some(m => m.id === currentUser.id) ||
+                      (group.invitedUsers && group.invitedUsers.includes(currentUser.id));
+                     
+    if (!hasAccess) {
+      return false;
+    }
+    
+    // For "My Groups" view, only show private groups where user is a member
+    if (showMyGroups) {
+      return group.members.some(m => m.id === currentUser.id);
+    }
+    
+    // If we get here, this is a private group the user has access to
     return true;
   });
 
