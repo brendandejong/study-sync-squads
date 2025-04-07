@@ -1,4 +1,5 @@
 
+import { useEffect } from 'react';
 import { StudyGroup, Message } from '@/types';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useAuth } from '@/context/AuthContext';
@@ -28,6 +29,20 @@ const GroupDetails = ({
   
   const isCurrentUserMember = group.members.some(member => member.id === currentUser?.id);
   const isCurrentUserOwner = group.createdBy === currentUser?.id;
+
+  // Initialize group messages in localStorage if they don't exist
+  useEffect(() => {
+    if (group && isOpen) {
+      const storageKey = `groupMessages-${group.id}`;
+      const existingMessages = localStorage.getItem(storageKey);
+      
+      if (!existingMessages) {
+        // If no messages exist in localStorage, initialize with the provided messages
+        localStorage.setItem(storageKey, JSON.stringify(messages));
+        console.log(`Initialized messages for group: ${group.id}`);
+      }
+    }
+  }, [group, isOpen, messages]);
 
   // Add logging for debugging
   console.log(`GroupDetails - Group ID: ${group.id}`);
